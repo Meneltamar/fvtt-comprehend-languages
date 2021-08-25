@@ -71,6 +71,7 @@ Hooks.once('init', () => {
 
 Hooks.on("renderJournalSheet", async function (obj, html) {
     // Only inject the link if the actor is of type "character" and the user has permission to update it
+    if(game.user.isGM){
     const journal = obj.document;
   
     let element = html.find(".window-header .window-title");
@@ -80,12 +81,14 @@ Hooks.on("renderJournalSheet", async function (obj, html) {
     );
     button.on("click", () => ComprehendLanguagesTranslator.constructTranslatedJournalEntry(journal));
     element.after(button);
-  });
+    }
+});
 
 class ComprehendLanguagesTranslator {
     static async translate_text(text) {
         const token = game.settings.get(ComprehendLanguages.ID,ComprehendLanguages.SETTINGS.DEEPL_TOKEN)
-        let data = `auth_key=${token}&text=${text}&target_lang=DE&source_lang=EN`
+        const target_lang = game.settings.get(ComprehendLanguages.ID,ComprehendLanguages.SETTINGS.TARGET_LANG)
+        let data = `auth_key=${token}&text=${text}&target_lang=${target_lang}&source_lang=EN`
         //return response.json();
         let translation = await fetch('https://api-free.deepl.com/v2/translate?'+data)
         .then(response => response.json())
@@ -104,9 +107,10 @@ class ComprehendLanguagesTranslator {
     static async constructTranslatedJournalEntry(journalEntry){
         //console.log(journalEntry);
         let translatedText = await this.translateJournalEntry(journalEntry.id)
+        const target_lang = game.settings.get(ComprehendLanguages.ID,ComprehendLanguages.SETTINGS.TARGET_LANG)
         console.log(translatedText)
         let newJournalEntry = await JournalEntry.create({
-            name : "de_"+journalEntry.name,
+            name : target_lang+"_"+journalEntry.name,
             content : translatedText,
             folder : journalEntry.folder
         })
