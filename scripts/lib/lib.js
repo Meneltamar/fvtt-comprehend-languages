@@ -99,13 +99,29 @@ class ComprehendLanguagesTranslator {
     }
 
     static async translateJournalEntry(journalEntryId){
+
         let text = game.journal.get(journalEntryId).data.content
         let translation = await this.translate_text(jQuery(text).text());
         return translation.translations[0].text
+        
     }
 
     static async constructTranslatedJournalEntry(journalEntry){
         //console.log(journalEntry);
+        if(!game.settings.get(ComprehendLanguages.ID,ComprehendLanguages.SETTINGS.DEEPL_TOKEN)){
+            let d = new Dialog({
+                title: "DeepL Token missing",
+                content: "<p>Error: No DeepL token found. <br> Please add a DeepL Token to your Settings</p>",
+                buttons: {
+                 one: {
+                  icon: '<i class="fas fa-check"></i>',
+                  label: "OK",
+                 },
+                },
+                default: "one",
+               });
+               d.render(true);
+        } else {
         let translatedText = await this.translateJournalEntry(journalEntry.id)
         const target_lang = game.settings.get(ComprehendLanguages.ID,ComprehendLanguages.SETTINGS.TARGET_LANG)
         console.log(translatedText)
@@ -114,6 +130,7 @@ class ComprehendLanguagesTranslator {
             content : translatedText,
             folder : journalEntry.folder
         })
+    }
     }
     
     
