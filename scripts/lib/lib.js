@@ -71,7 +71,6 @@ Hooks.once('init', () => {
 })
 
 Hooks.on("renderJournalSheet", async function (obj, html) {
-    // Only inject the link if the actor is of type "character" and the user has permission to update it
     if(game.user.isGM){
     const journal = obj.document;
   
