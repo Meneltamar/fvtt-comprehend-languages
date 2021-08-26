@@ -7,7 +7,8 @@ class ComprehendLanguages {
 
     static SETTINGS = {
         DEEPL_TOKEN : 'deepl-token',
-        TARGET_LANG : 'target-language'
+        TARGET_LANG : 'target-language',
+        SUBSETTINGS_MENU : 'subsetting-menu'
     }
 
     static log(force, ...args) {  
