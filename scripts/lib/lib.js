@@ -97,8 +97,7 @@ class ComprehendLanguagesTranslator {
       ComprehendLanguages.ID,
       ComprehendLanguages.SETTINGS.TARGET_LANG
     );
-    let data = `auth_key=${token}&text=${text}&target_lang=${target_lang}&source_lang=EN`;
-    //return response.json();
+    let data = `auth_key=${token}&text=${text}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`;
     let translation = await fetch(
       "https://api-free.deepl.com/v2/translate?" + data
     )
@@ -111,7 +110,9 @@ class ComprehendLanguagesTranslator {
 
   static async translateJournalEntry(journalEntryId) {
     let text = game.journal.get(journalEntryId).data.content;
-    let translation = await this.translate_text(jQuery(text).text());
+    text = text.replace("#", "");
+    //    let translation = await this.translate_text(jQuery(text).text());
+    let translation = await this.translate_text(text);
     return translation.translations[0].text;
   }
 
