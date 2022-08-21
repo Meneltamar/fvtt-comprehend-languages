@@ -34,6 +34,43 @@ export class ComprehendLanguagesTranslator {
     return translation.translations[0].text;
   }
 
+  static async split_html(input_HTML) {
+    let taglist = [];
+    let output_HTML = [];
+    [...input_HTML].forEach(function (value, i) {
+      switch (["<", ">"].indexOf(value)) {
+        case -1: {
+          break;
+        }
+        case 0:
+          taglist.push(i);
+          break;
+        case 1:
+          taglist.push(i);
+      }
+    });
+    let even = [],
+      uneven = [];
+    taglist.forEach((value, index) => {
+      if (index % 2 == 0) {
+        even.push(value);
+      } else {
+        uneven.push(value);
+      }
+    });
+    even.forEach((start_idx, index) => {
+      const end_idx = uneven[index];
+      const next_start_idx = even[index + 1];
+      output_HTML.push(input_HTML.substr(start_idx, end_idx + 1 - start_idx));
+      if (next_start_idx - end_idx < 2 || isNaN(next_start_idx)) {
+      } else {
+        output_HTML.push(
+          input_HTML.substr(end_idx + 1, even[index + 1] - end_idx - 1)
+        );
+      }
+    });
+    return output_HTML;
+  }
   static async constructTranslatedJournalEntry(journalEntry) {
     //console.log(journalEntry);
     if (
