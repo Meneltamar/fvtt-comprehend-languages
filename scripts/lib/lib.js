@@ -15,7 +15,7 @@ Hooks.on("renderJournalSheet", async function (obj, html) {
       `<a class="popout" style><i class="fas fa-book"></i>Translate</a>`
     );
     button.on("click", () =>
-      ComprehendLanguagesTranslator.constructTranslatedJournalEntry(journal)
+      ComprehendLanguagesTranslator.buttonTranslateJournalEntry(journal)
     );
     element.after(button);
   }
