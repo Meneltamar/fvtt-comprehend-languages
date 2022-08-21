@@ -20,7 +20,7 @@
   "conflicts": [
     
   ],
-  "scripts": [
+  "esmodules": [
     "/scripts/lib/lib.js"
   ],
   "styles": [
