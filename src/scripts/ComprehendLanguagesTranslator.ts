@@ -8,23 +8,14 @@ export class ComprehendLanguagesTranslator {
       this.dialogTokenMissing();
     } else {
       const pages = journal.pages
-      // journal.createEmbeddedDocuments("JournalEntryPage",[{
-      //   name:"Testpage Create",
-      //   type: "text",
-      //   text: {content:"blablubb",format: CONST.JOURNAL_ENTRY_PAGE_FORMATS.HTML}
-      // }])
       const newName:string = target_lang + "_" + journal.name
       const newJournalEntry = await JournalEntry.createDocuments([{...journal, name: newName, folder: journal.folder}])
-      // pages.forEach((journalPage)=> this.translateSinglePage(journalPage,token,target_lang).then((page) => newJournalEntry[0].createEmbeddedDocuments("JournalEntryPage",page)))
-      // pages.forEach((journalPage)=> newJournalEntry[0].createEmbeddedDocuments("JournalEntryPage",this.translateSinglePage(journalPage,token,target_lang)))
       const newPages = await Promise.all(
         pages.map(async (page) => this.translateSinglePage(page,token,target_lang))
         )
       
       await newJournalEntry[0].createEmbeddedDocuments("JournalEntryPage",newPages.flat())
 
-      // 
-      // await ComprehendLanguagesTranslator.translateSinglePage(journal, token, target_lang);
     }
   }
 
