@@ -6,7 +6,7 @@
   "library": "false",
   "manifestPlusVersion": "1.0.0",
   "minimumCoreVersion": "0.8.8",
-  "compatibleCoreVersion": "9.28",
+  "compatibleCoreVersion": "9.280",
   "authors": [
     {
       "name": "Meneltamar",
