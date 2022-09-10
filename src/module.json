@@ -5,17 +5,16 @@
   "version": "This is auto replaced",
   "library": "false",
   "manifestPlusVersion": "1.0.0",
-  "minimumCoreVersion": "10.284",
-  "compatibleCoreVersion": "10.284",
+  "compatibility":{
+    "minimum": "10",
+    "verified": "10.284"
+  },
   "authors": [
     {
       "name": "Meneltamar",
       "url": "https://github.com/meneltamar",
       "discord": "Meneltamar#3331"
     }
-  ],
-  "dependencies": [
-
   ],
   "conflicts": [
     
