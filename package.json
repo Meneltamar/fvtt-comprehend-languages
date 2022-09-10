@@ -13,9 +13,8 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "tsc --outDir ./dist",
-    "build:dev": "tsc -w && cp .",
-    "build:webpack": "webpack"
+    "build": "webpack --mode production",
+    "build:dev": "webpack"
   },
   "dependencies": {
     "module-alias": "^2.2.2",

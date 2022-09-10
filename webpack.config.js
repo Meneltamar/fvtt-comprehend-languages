@@ -1,9 +1,18 @@
 const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
-
+const buildMode =
+  process.argv[3] === "production" ? "production" : "development";
+const isProductionBuild = buildMode === "production";
+const [outDir] = (() => {
+  const outDir =
+    buildMode === "production"
+      ? path.join(__dirname, "dist/")
+      : path.join("/home/ubuntu/foundrydata/Data/modules/comprehend-languages");
+  return [outDir];
+})();
 module.exports = {
   // bundling mode
-  mode: "production",
+  mode: buildMode,
 
   // entry files
   entry: "./src/scripts/lib.ts",
@@ -11,7 +20,7 @@ module.exports = {
   // output bundles (location)
   output: {
     // path: path.resolve(__dirname, "dist"),
-    path: "/home/ubuntu/foundrydata/Data/modules/comprehend-languages",
+    path: outDir,
     filename: "./scripts/main.js",
     clean: true,
   },
@@ -20,6 +29,8 @@ module.exports = {
   resolve: {
     extensions: [".ts", ".js"],
   },
+  devtool: isProductionBuild ? undefined : "inline-source-map",
+  watch: !isProductionBuild,
 
   // loaders
   module: {
