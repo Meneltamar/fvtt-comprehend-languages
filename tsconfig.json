@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "outDir": "/home/ubuntu/foundrydata/Data/modules/comprehend-languages/",
+    "rootDir": "src",
+    "allowJs": true,
+    "target": "ES2018",
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "noImplicitReturns": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@lib/*": ["src/scripts/lib/*"]
+    }
+  },
+  "include": ["./src/**/*", "./src/**/*.json", "./src/**/*.css"]
+}

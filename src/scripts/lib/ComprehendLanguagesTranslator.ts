@@ -1,13 +1,14 @@
-import { ComprehendLanguages } from "./ComprehendLanguages.js";
+import { ComprehendLanguages } from "./ComprehendLanguages.js"; 
+declare const JournalEntry, game, Dialog: any
 export class ComprehendLanguagesTranslator {
-  static async buttonTranslateJournalEntry(journal) {
-    const { token, target_lang } =
+  static async buttonTranslateJournalEntry(journal) { 
+    const { token, target_lang} =
       await ComprehendLanguagesTranslator.getTranslationSettings();
     if (!token) {
       this.dialogTokenMissing();
     } else {
-      const journalText = await this.getJournalText(journal);
-      let translation = await this.translate_text(
+      const journalText:string = await this.getJournalText(journal);
+      let translation:string = await this.translate_text(
         journalText,
         token,
         target_lang
@@ -17,12 +18,12 @@ export class ComprehendLanguagesTranslator {
   }
 
   static async getJournalText(journal) {
-    let text = journal.data.content;
+    let text:string = journal.data.content;
     text = text.replace("#", "");
     return text;
   }
 
-  static async createNewJournalEntry(journal, translation) {
+  static async createNewJournalEntry(journal, translation) : Promise<void> {
     const { token, target_lang } =
       await ComprehendLanguagesTranslator.getTranslationSettings();
     await JournalEntry.create({
@@ -31,7 +32,7 @@ export class ComprehendLanguagesTranslator {
       folder: journal.folder,
     });
   }
-  static async translate_text(text, token, target_lang) {
+  static async translate_text(text, token, target_lang): Promise<string> {
     let data = `auth_key=${token}&text=${text}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`;
     let translation = await fetch(
       "https://api-free.deepl.com/v2/translate?" + data
@@ -43,7 +44,7 @@ export class ComprehendLanguagesTranslator {
     return translation.translations[0].text;
   }
 
-  static async getTranslationSettings() {
+  static async getTranslationSettings(): Promise<{token: string, target_lang:string}> {
     const token = game.settings.get(
       ComprehendLanguages.ID,
       ComprehendLanguages.SETTINGS.DEEPL_TOKEN
@@ -92,7 +93,7 @@ export class ComprehendLanguagesTranslator {
     });
     return output_HTML;
   }
-  static async dialogTokenMissing() {
+  static async dialogTokenMissing() { 
     let d = new Dialog({
       title: "DeepL Token missing",
       content:
