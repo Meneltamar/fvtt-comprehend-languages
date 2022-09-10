@@ -1,5 +1,7 @@
-import { ComprehendLanguagesTranslator } from "./ComprehendLanguagesTranslator.js";
-import { ComprehendLanguages } from "./ComprehendLanguages.js";
+import { ComprehendLanguagesTranslator } from "./ComprehendLanguagesTranslator";
+import { ComprehendLanguages } from "./ComprehendLanguages"; 
+
+declare const Hooks,game:any
 
 Hooks.once("init", () => {
   ComprehendLanguages.initialize();

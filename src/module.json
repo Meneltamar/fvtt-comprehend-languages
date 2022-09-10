@@ -21,7 +21,7 @@
     
   ],
   "esmodules": [
-    "/scripts/lib/lib.js"
+    "/scripts/main.js"
   ],
   "styles": [
     "/styles/module.css"

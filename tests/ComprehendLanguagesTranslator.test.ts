@@ -1,4 +1,4 @@
-import { ComprehendLanguagesTranslator } from "../src/scripts/lib/ComprehendLanguagesTranslator";
+import { ComprehendLanguagesTranslator } from "../src/scripts/ComprehendLanguagesTranslator";
 import fetch from "node-fetch";
 if (!globalThis.fetch) {
   globalThis.fetch = fetch;

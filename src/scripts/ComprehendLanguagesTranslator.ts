@@ -1,4 +1,4 @@
-import { ComprehendLanguages } from "./ComprehendLanguages.js"; 
+import { ComprehendLanguages } from "./ComprehendLanguages"; 
 declare const JournalEntry, game, Dialog: any
 export class ComprehendLanguagesTranslator {
   static async buttonTranslateJournalEntry(journal) { 
