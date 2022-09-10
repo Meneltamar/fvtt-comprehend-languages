@@ -17,8 +17,7 @@ Now you are good to go. When opening a Journal Entry, a new button appears in th
 
 ![Example Translation](img/example-translation.png)
 
-At this moment, the module strips the text of all formatting. If there is enough interest in the module, persisting formatting/HTML of the input text will be one of the first new features.
+The module retains HTML formatting.
 
-Please also be aware that this is a very rudimentary implementation at the moment (ship early, I guess?). Bugs WILL happen and there is almost no error handling yet. If it does not work, please check that your token is correct.
+If you find any issues, feel free to contact me directly or file an issue here on GitHub.
 
-## Changelog
