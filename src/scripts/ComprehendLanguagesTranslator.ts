@@ -1,5 +1,5 @@
 import { ComprehendLanguages } from "./ComprehendLanguages"; 
-declare const JournalEntry, game, Dialog: any
+declare const JournalEntry, game, Dialog, data, CONST: any
 export class ComprehendLanguagesTranslator {
   static async buttonTranslateJournalEntry(journal) { 
     const { token, target_lang} =
@@ -7,30 +7,52 @@ export class ComprehendLanguagesTranslator {
     if (!token) {
       this.dialogTokenMissing();
     } else {
-      const journalText:string = await this.getJournalText(journal);
-      let translation:string = await this.translate_text(
-        journalText,
-        token,
-        target_lang
-      );
-      await this.createNewJournalEntry(journal, translation);
+      const pages = journal.pages
+      // journal.createEmbeddedDocuments("JournalEntryPage",[{
+      //   name:"Testpage Create",
+      //   type: "text",
+      //   text: {content:"blablubb",format: CONST.JOURNAL_ENTRY_PAGE_FORMATS.HTML}
+      // }])
+      const newName:string = target_lang + "_" + journal.name
+      const newJournalEntry = await JournalEntry.createDocuments([{...journal, name: newName, folder: journal.folder}])
+      // pages.forEach((journalPage)=> this.translateSinglePage(journalPage,token,target_lang).then((page) => newJournalEntry[0].createEmbeddedDocuments("JournalEntryPage",page)))
+      // pages.forEach((journalPage)=> newJournalEntry[0].createEmbeddedDocuments("JournalEntryPage",this.translateSinglePage(journalPage,token,target_lang)))
+      const newPages = await Promise.all(
+        pages.map(async (page) => this.translateSinglePage(page,token,target_lang))
+        )
+      
+      await newJournalEntry[0].createEmbeddedDocuments("JournalEntryPage",newPages.flat())
+
+      // 
+      // await ComprehendLanguagesTranslator.translateSinglePage(journal, token, target_lang);
     }
   }
 
-  static async getJournalText(journal) {
-    let text:string = journal.data.content;
+  private static async translateSinglePage(journalPage: any, token: string, target_lang: string) {
+    const journalText: string = await this.getJournalPageText(journalPage);
+    let translation: string = await this.translate_text(
+      journalText,
+      token,
+      target_lang
+    );
+    const newJournalPage = await this.createNewJournalEntry(journalPage, translation);
+    return newJournalPage  
+  }
+
+  static async getJournalPageText(journalPage) {
+    let text:string = journalPage.text.content;
     text = text.replace("#", "");
     return text;
   }
 
-  static async createNewJournalEntry(journal, translation) : Promise<void> {
+  static async createNewJournalEntry(journal, translation) : Promise<any> {
     const { token, target_lang } =
       await ComprehendLanguagesTranslator.getTranslationSettings();
-    await JournalEntry.create({
-      name: target_lang + "_" + journal.name,
-      content: translation,
-      folder: journal.folder,
-    });
+    const newJournalEntry = [{
+      ...journal, text:{content: translation, format: CONST.JOURNAL_ENTRY_PAGE_FORMATS.HTML}
+    }]
+    return newJournalEntry
+    
   }
   static async translate_text(text, token, target_lang): Promise<string> {
     let data = `auth_key=${token}&text=${text}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`;
