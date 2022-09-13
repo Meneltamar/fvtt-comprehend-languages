@@ -1,4 +1,5 @@
-declare const game: any
+import * as foundry from '../../types/foundry/index'
+declare const game:Game;
 export class ComprehendLanguages {
   static ID = "comprehend-languages";
 
@@ -15,6 +16,7 @@ export class ComprehendLanguages {
   static log(force, ...args) {
     const shouldLog =
       force ||
+//      @ts-ignore
       game.modules.get("_dev-mode")?.api?.getPackageDebugValue(this.ID);
 
     if (shouldLog) {
