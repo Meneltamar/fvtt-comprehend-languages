@@ -1,13 +1,14 @@
 import { ComprehendLanguagesTranslator } from "./ComprehendLanguagesTranslator";
 import { ComprehendLanguages } from "./ComprehendLanguages"; 
 
-declare const Hooks,game:any
+declare const Hooks:any
+declare const game:Game
 
 Hooks.once("init", () => {
   ComprehendLanguages.initialize();
 });
 
-Hooks.on("renderJournalSheet", async function (obj, html) {
+Hooks.on("renderJournalSheet", async function (obj:JournalSheet<JournalEntry>, html) {
   if (game.user.isGM) {
     const journal = obj.document;
 

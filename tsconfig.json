@@ -12,7 +12,15 @@
     "baseUrl": ".",
     "paths": {
       "@lib/*": ["src/scripts/lib/*"]
-    }
+    },
+    "typeRoots": [
+      "node_modules/@types",
+      "node_modules/handlebars",
+      "types/foundry"
+    ]
   },
-  "include": ["./src/**/*", "./src/**/*.json", "./src/**/*.css"]
+  "include": ["./src/**/*", "./src/**/*.json", "./src/**/*.css"],
+  "ts-node": {
+    "files": true
+  }
 }
