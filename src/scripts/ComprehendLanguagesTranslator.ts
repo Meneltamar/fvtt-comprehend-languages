@@ -52,13 +52,23 @@ export class ComprehendLanguagesTranslator {
   }
   static async translate_text(text:string, token:string, target_lang:string): Promise<string> {
     let data = `auth_key=${token}&text=${text}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`;
-    let translation = await fetch(
-      "https://api-free.deepl.com/v2/translate?" + data
+    // let translation = await fetch(
+    //   "https://api-free.deepl.com/v2/translate?" + data,{
+    //     mode:'cors',
+    //     method:'POST',
+    //   }
+    // )
+    //   .then((response) => response.json())
+    //   .then((respText) => {
+    //     return respText;
+    //   });
+    let response = await fetch(
+      "https://api-free.deepl.com/v2/translate?" + data,{
+        mode:'cors',
+        method:'GET',
+      }
     )
-      .then((response) => response.json())
-      .then((respText) => {
-        return respText;
-      });
+    let translation:any = await response.json()
     return translation.translations[0].text;
   }
 
