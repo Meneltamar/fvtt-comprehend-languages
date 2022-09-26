@@ -33,7 +33,7 @@ export class ComprehendLanguagesTranslator {
     });
   }
   static async translate_text(text, token, target_lang): Promise<string> {
-    let data = `auth_key=${token}&text=${text}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`;
+    let data = new URLSearchParams(`auth_key=${token}&text=${text}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`);
     let translation = await fetch(
       "https://api-free.deepl.com/v2/translate?" + data
     )
