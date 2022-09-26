@@ -51,7 +51,7 @@ export class ComprehendLanguagesTranslator {
     
   }
   static async translate_text(text:string, token:string, target_lang:string): Promise<string> {
-    let data = `auth_key=${token}&text=${text}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`;
+    let data = new URLSearchParams(`auth_key=${token}&text=${text}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`);
     // let translation = await fetch(
     //   "https://api-free.deepl.com/v2/translate?" + data,{
     //     mode:'cors',
@@ -64,12 +64,11 @@ export class ComprehendLanguagesTranslator {
     //   });
     let response = await fetch(
       "https://api-free.deepl.com/v2/translate?" + data,{
-        mode:'cors',
         method:'GET',
       }
     )
     let translation:any = await response.json()
-    return translation.translations[0].text;
+    return await translation.translations[0].text;
   }
 
   static async getTranslationSettings(): Promise<{token: any, target_lang:any}> {
