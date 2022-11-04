@@ -2,6 +2,12 @@ import { ComprehendLanguages } from "./ComprehendLanguages";
 declare const CONST, Dialog: any
 declare const game: Game
 
+interface DeepLTranslation {
+  translations: [
+    {text: string}
+  ]
+}
+
 export class ComprehendLanguagesTranslator {
   static async buttonTranslateJournalEntry(journal: JournalEntry) { 
     const { token, target_lang} =
@@ -20,8 +26,8 @@ export class ComprehendLanguagesTranslator {
   }
 
   private static async translateSinglePage(journalPage: JournalEntryPage, token: string, target_lang: string) {
-    const journalText: string = await this.getJournalPageText(journalPage);
-    let translation: string = await this.translate_text(
+    const journalText = await this.getJournalPageText(journalPage);
+    let translation = await this.translate_text(
       journalText,
       token,
       target_lang
@@ -30,7 +36,7 @@ export class ComprehendLanguagesTranslator {
     return newJournalPage  
   }
 
-  static async getJournalPageText(journalPage) {
+  static async getJournalPageText(journalPage) : Promise<string> {
     if(journalPage.text.content){
     let text:string = journalPage.text.content;
     text = text.replace("#", "");
@@ -66,9 +72,9 @@ export class ComprehendLanguagesTranslator {
       "https://api-free.deepl.com/v2/translate?" + data,{
         method:'GET',
       }
-    )
-    let translation:any = await response.json()
-    return await translation.translations[0].text;
+      )
+      let translation:DeepLTranslation = await response.json()
+      return translation.translations[0].text;
   }
 
   static async getTranslationSettings(): Promise<{token: any, target_lang:any}> {
