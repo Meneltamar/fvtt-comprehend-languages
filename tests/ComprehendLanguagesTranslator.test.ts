@@ -15,6 +15,16 @@ require("dotenv").config();
 //   expect(result).toBe("Hallo Welt");
 // }); 
 
+// test("translates html via API", async () => {
+//   let token:string = process.env.API_KEY;
+//   const result = await ComprehendLanguagesTranslator.translate_html(
+//     "<p>Hello</p> <p>World</p>",
+//     token,
+//     "DE"
+//   );
+//   expect(result).toBe("<p>Hallo</p> <p>Welt</p>");
+// }); 
+
 test("deconstructs HTML properly", async () => {
   const input_HTML:string = "<a>Hello</a><p>World</p>";
   let output_HTML: Array<string> = await ComprehendLanguagesTranslator._split_html(input_HTML);

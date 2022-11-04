@@ -27,7 +27,7 @@ export class ComprehendLanguagesTranslator {
 
   private static async translateSinglePage(journalPage: JournalEntryPage, token: string, target_lang: string) {
     const journalText = await this.getJournalPageText(journalPage);
-    let translation = await this.translate_text(
+    let translation = await this.translate_html(
       journalText,
       token,
       target_lang
@@ -45,6 +45,22 @@ export class ComprehendLanguagesTranslator {
       return ''
     } 
     
+  }
+
+  static async translate_html(long_html:string, token:string, target_lang:string) : Promise<string> {
+    const split_html = this._split_html(long_html)
+    let translated_html = split_html.map(async (value) => {
+      if(value.startsWith("<")){
+        return value
+      }else if((value.trim().length) == 0){
+        return " "
+      }
+        else{
+        return await this.translate_text(value, token, target_lang)
+      }
+    })
+    const full_string = await Promise.all(translated_html)
+    return full_string.join('')
   }
 
   static async createNewJournalEntry(journal: JournalEntryPage, translation:string) : Promise<any> {
@@ -89,7 +105,7 @@ export class ComprehendLanguagesTranslator {
     return { token, target_lang };
   }
 
-  static async _split_html(input_HTML:string) {
+  static _split_html(input_HTML:string) {
     let taglist:Array<number> = [];
     let output_HTML:Array<string> = [];
     [...input_HTML].forEach(function (value, i) {
