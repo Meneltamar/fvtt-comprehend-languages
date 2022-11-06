@@ -1,4 +1,5 @@
 import * as foundry from '../../types/foundry/index'
+import { addTranslateButton } from './lib';
 declare const game:Game;
 export class ComprehendLanguages {
   static ID = "comprehend-languages";
@@ -11,6 +12,7 @@ export class ComprehendLanguages {
     DEEPL_TOKEN: "deepl-token",
     TARGET_LANG: "target-language",
     SUBSETTINGS_MENU: "subsetting-menu",
+    ICON_ONLY: "iconOnly"
   };
 
   static log(force, ...args) {
@@ -33,6 +35,18 @@ export class ComprehendLanguages {
       default: "",
       scope: "world",
     });
+
+    game.settings.register(this.ID, this.SETTINGS.ICON_ONLY, {
+      name: "Icon Only",
+      config: true,
+      hint: "If enabled the header button wil show with only the icon and no text",
+      type: Boolean,
+      default: false,
+      scope: "world",
+    });
+
+   
+
     game.settings.register(this.ID, this.SETTINGS.TARGET_LANG, {
       name: "Target Language",
       config: true,
@@ -67,5 +81,37 @@ export class ComprehendLanguages {
       },
       scope: "world",
     });
+
+    // We replace the games window registry with a proxy object so we can intercept
+    // every new application window creation event.
+    const handler = {
+      ownKeys: (target) => {
+        return Reflect.ownKeys(target).filter((app:any) => {
+          const appId = parseInt(app);
+          if (!isNaN(appId)) {
+            // TODO DO SOMETHING ??
+            return false;
+          }
+          return true;
+        });
+      },
+      set: (obj, prop, value) => {
+        const result = Reflect.set(obj, prop, value);
+        console.log("Intercept ui-window create", value);
+        if (
+          value &&
+          value.object
+        ) {
+          if(value.object instanceof JournalEntry || value.object instanceof Item) {
+            addTranslateButton(value).catch((err) => console.error(err));
+          }
+        }
+        return result;
+      },
+    };
+    //@ts-ignore
+    ui.windows = new Proxy(ui.windows, handler); // eslint-disable-line no-undef
+    //@ts-ignore
+    console.log("Installed window interceptor", ui.windows); // eslint-disable-line no-undef
   }
 }
