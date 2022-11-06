@@ -85,7 +85,6 @@ export class ComprehendLanguagesTranslator {
   }
 
   static async translate_html(long_html:string, token:string, target_lang:string) : Promise<string> {
-    // TODO FIX ENTITY LINK BROKEN FROM TRADUCTIOn
     const split_html = this._split_html(long_html)
     let translated_html = split_html.map(async (value) => {
       if(value.startsWith("<")){
