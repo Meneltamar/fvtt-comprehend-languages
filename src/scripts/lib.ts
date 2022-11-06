@@ -9,9 +9,9 @@ Hooks.once("init", () => {
 });
 
 Hooks.on("renderJournalSheet", async function (app:JournalSheet<JournalEntry>, html, data) {
-  if (game.user.isGM) {
-    const journal = app.document;
-    addTranslateButton(app);
+  addTranslateButton(app);
+  // if (game.user.isGM) {
+    // const journal = app.document;
     // let element = html.find(".window-title");
     // if (element.length != 1) return;
     // let button = $(
@@ -21,11 +21,13 @@ Hooks.on("renderJournalSheet", async function (app:JournalSheet<JournalEntry>, h
     //   ComprehendLanguagesTranslator.buttonTranslateJournalEntry(journal)
     // );
     // element.after(button);
-    
-  }
+  // }
 });
 
 export const addTranslateButton = async function(app) {
+  if (!game.user.isGM) {
+    return;
+  }
   const documentToTranslate = app.document;
 
   const TIMEOUT_INTERVAL = 50; // ms
