@@ -111,7 +111,20 @@ export class ComprehendLanguagesTranslator {
     
   }
   static async translate_text(text:string, token:string, target_lang:string): Promise<string> {
-    let data = new URLSearchParams(`auth_key=${token}&text=${text}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`);
+    
+    // TODO Find a better method this is a retrocompatibility fix for issue #9 and fvtt 9
+    let newText = duplicate(text);
+    newText = this.replaceAll(newText,`@Scene[`,`@UUID[Scene.`);
+    newText = this.replaceAll(newText,`@Actor[`,`@UUID[Actor.`);
+    newText = this.replaceAll(newText,`@Item[`,`@UUID[Item.`);
+    newText = this.replaceAll(newText,`@JournalEntry[`,`@UUID[JournalEntry.`);
+    newText = this.replaceAll(newText,`@RollTable[`,`@UUID[RollTable.`);
+    newText = this.replaceAll(newText,`@Cards[`,`@UUID[Cards.`);
+    newText = this.replaceAll(newText,`@Folder[`,`@UUID[Folder.`);
+    newText = this.replaceAll(newText,`@Playlist[`,`@UUID[Playlist.`);
+    newText = this.replaceAll(newText,`@Compendium[`,`@UUID[Compendium.`);
+    
+    let data = new URLSearchParams(`auth_key=${token}&text=${newText}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`);
     // let translation = await fetch(
     //   "https://api-free.deepl.com/v2/translate?" + data,{
     //     mode:'cors',
@@ -122,6 +135,7 @@ export class ComprehendLanguagesTranslator {
     //   .then((respText) => {
     //     return respText;
     //   });
+
     let response = await fetch(
       "https://api-free.deepl.com/v2/translate?" + data,{
         method:'GET',
@@ -129,6 +143,10 @@ export class ComprehendLanguagesTranslator {
       )
       let translation:DeepLTranslation = await response.json()
       return translation.translations[0].text;
+  }
+
+  private static replaceAll(string, search, replace) {
+    return string.split(search).join(replace);
   }
 
   static async getTranslationSettings(): Promise<{token: any, target_lang:any}> {
