@@ -26,7 +26,7 @@ Hooks.on("renderJournalSheet", async function (app:JournalSheet<JournalEntry>, h
 });
 
 export const addTranslateButton = async function(app) {
-  const journal = app.document;
+  const documentToTranslate = app.document;
 
   const TIMEOUT_INTERVAL = 50; // ms
     const MAX_TIMEOUT = 1000; // ms
@@ -60,9 +60,15 @@ export const addTranslateButton = async function(app) {
         )}"></i>${buttonText}</a>`
       );
       /* eslint-enable no-undef */
-      link.on("click", () =>
-        ComprehendLanguagesTranslator.buttonTranslateJournalEntry(journal)
-      );
+      link.on("click", () => {
+        if(documentToTranslate instanceof JournalEntry) {
+          ComprehendLanguagesTranslator.buttonTranslateJournalEntry(documentToTranslate);
+        } else if(documentToTranslate instanceof Item){
+          ComprehendLanguagesTranslator.buttonTranslateItem(documentToTranslate);
+        } else {
+          console.error(`comprehend-languages | The document type ${documentToTranslate} is not supported!`);
+        }
+      });
       // eslint-disable-next-line no-undef
       app.element.find(".window-title").after(link);
       console.log("Attached", app);

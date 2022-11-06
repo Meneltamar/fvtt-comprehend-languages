@@ -25,6 +25,43 @@ export class ComprehendLanguagesTranslator {
     }
   }
 
+  static async buttonTranslateItem(item: Item) { 
+    const { token, target_lang} =
+      await ComprehendLanguagesTranslator.getTranslationSettings();
+    if (!token) {
+      this.dialogTokenMissing();
+    } else {
+      // TODO Not every system has the "description" property on system item
+      //@ts-ignore
+      if(item.system.description){
+        const newName = target_lang + "_" + item.name
+        const newDescriptionText =  await this.translate_html(
+          //@ts-ignore
+          item.system.description.value,
+          token,
+          target_lang
+        );
+        //@ts-ignore
+        const newItems = <Item[]>await Item.createDocuments([{ ...item, name: newName, folder: item.folder}]);
+        if(!newItems || newItems.length <= 0 ) {
+          return;
+        }
+        //@ts-ignore
+        // await newItems[0].update({
+        //   system: {
+        //     description: {
+        //       value:
+        //     }newDescriptionText
+        //   }
+        // });
+        setProperty(newItems[0].system.description, `value`, newDescriptionText);
+      } else {
+        // DO NOTHING
+        console.warn(`Nothing to translate on the item ${item.name}`);
+      }
+    }
+  }
+
   private static async translateSinglePage(journalPage: JournalEntryPage, token: string, target_lang: string) {
     const journalText = await this.getJournalPageText(journalPage);
     let translation = await this.translate_html(
@@ -48,6 +85,7 @@ export class ComprehendLanguagesTranslator {
   }
 
   static async translate_html(long_html:string, token:string, target_lang:string) : Promise<string> {
+    // TODO FIX ENTITY LINK BROKEN FROM TRADUCTIOn
     const split_html = this._split_html(long_html)
     let translated_html = split_html.map(async (value) => {
       if(value.startsWith("<")){
