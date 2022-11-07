@@ -1,6 +1,5 @@
 node_modules
 .idea
-.gitignore
 .env
 .prettierrc
 /package-lock.json
