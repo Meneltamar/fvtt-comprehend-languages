@@ -8,21 +8,6 @@ Hooks.once("init", () => {
   ComprehendLanguages.initialize();
 });
 
-Hooks.on("renderJournalSheet", async function (app:JournalSheet<JournalEntry>, html, data) {
-  addTranslateButton(app);
-  // if (game.user.isGM) {
-    // const journal = app.document;
-    // let element = html.find(".window-title");
-    // if (element.length != 1) return;
-    // let button = $(
-    //   `<a class="popout" style><i class="fas fa-book"></i>Translate</a>`
-    // );
-    // button.on("click", () =>
-    //   ComprehendLanguagesTranslator.buttonTranslateJournalEntry(journal)
-    // );
-    // element.after(button);
-  // }
-});
 
 export const addTranslateButton = async function(app) {
   if (!game.user.isGM) {
