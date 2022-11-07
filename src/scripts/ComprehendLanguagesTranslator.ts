@@ -25,6 +25,43 @@ export class ComprehendLanguagesTranslator {
     }
   }
 
+  static async buttonTranslateItem(item: Item) { 
+    const { token, target_lang} =
+      await ComprehendLanguagesTranslator.getTranslationSettings();
+    if (!token) {
+      this.dialogTokenMissing();
+    } else {
+      // TODO Not every system has the "description" property on system item
+      //@ts-ignore
+      if(item.system.description){
+        const newName = target_lang + "_" + item.name
+        const newDescriptionText =  await this.translate_html(
+          //@ts-ignore
+          item.system.description.value,
+          token,
+          target_lang
+        );
+        //@ts-ignore
+        const newItems = <Item[]>await Item.createDocuments([{ ...item, name: newName, folder: item.folder}]);
+        if(!newItems || newItems.length <= 0 ) {
+          return;
+        }
+        //@ts-ignore
+        // await newItems[0].update({
+        //   system: {
+        //     description: {
+        //       value:
+        //     }newDescriptionText
+        //   }
+        // });
+        await newItems[0].update({system:{description:{value:newDescriptionText}}})
+      } else {
+        // DO NOTHING
+        console.warn(`Nothing to translate on the item ${item.name}`);
+      }
+    }
+  }
+
   private static async translateSinglePage(journalPage: JournalEntryPage, token: string, target_lang: string) {
     const journalText = await this.getJournalPageText(journalPage);
     let translation = await this.translate_html(
@@ -73,7 +110,20 @@ export class ComprehendLanguagesTranslator {
     
   }
   static async translate_text(text:string, token:string, target_lang:string): Promise<string> {
-    let data = new URLSearchParams(`auth_key=${token}&text=${text}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`);
+    
+    // TODO Find a better method this is a retrocompatibility fix for issue #9 and fvtt 9
+    let newText = duplicate(text);
+    newText = this.replaceAll(newText,`@Scene[`,`@UUID[Scene.`);
+    newText = this.replaceAll(newText,`@Actor[`,`@UUID[Actor.`);
+    newText = this.replaceAll(newText,`@Item[`,`@UUID[Item.`);
+    newText = this.replaceAll(newText,`@JournalEntry[`,`@UUID[JournalEntry.`);
+    newText = this.replaceAll(newText,`@RollTable[`,`@UUID[RollTable.`);
+    newText = this.replaceAll(newText,`@Cards[`,`@UUID[Cards.`);
+    newText = this.replaceAll(newText,`@Folder[`,`@UUID[Folder.`);
+    newText = this.replaceAll(newText,`@Playlist[`,`@UUID[Playlist.`);
+    newText = this.replaceAll(newText,`@Compendium[`,`@UUID[Compendium.`);
+    
+    let data = new URLSearchParams(`auth_key=${token}&text=${newText}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`);
     // let translation = await fetch(
     //   "https://api-free.deepl.com/v2/translate?" + data,{
     //     mode:'cors',
@@ -84,6 +134,7 @@ export class ComprehendLanguagesTranslator {
     //   .then((respText) => {
     //     return respText;
     //   });
+
     let response = await fetch(
       "https://api-free.deepl.com/v2/translate?" + data,{
         method:'GET',
@@ -91,6 +142,10 @@ export class ComprehendLanguagesTranslator {
       )
       let translation:DeepLTranslation = await response.json()
       return translation.translations[0].text;
+  }
+
+  private static replaceAll(string, search, replace) {
+    return string.split(search).join(replace);
   }
 
   static async getTranslationSettings(): Promise<{token: any, target_lang:any}> {
