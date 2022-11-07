@@ -58,7 +58,7 @@ export const addTranslateButton = async function(app) {
       });
       // eslint-disable-next-line no-undef
       app.element.find(".window-title").after(link);
-      console.log("Attached", app);
+      // console.log("Attached", app);
     }
 }
 

@@ -97,7 +97,7 @@ export class ComprehendLanguages {
       },
       set: (obj, prop, value) => {
         const result = Reflect.set(obj, prop, value);
-        console.log("Intercept ui-window create", value);
+        // console.log("Intercept ui-window create", value);
         if (
           value &&
           value.object
