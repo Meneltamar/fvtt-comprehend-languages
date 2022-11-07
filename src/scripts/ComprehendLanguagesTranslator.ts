@@ -54,7 +54,7 @@ export class ComprehendLanguagesTranslator {
         //     }newDescriptionText
         //   }
         // });
-        setProperty(newItems[0].system.description, `value`, newDescriptionText);
+        await newItems[0].update({system:{description:{value:newDescriptionText}}})
       } else {
         // DO NOTHING
         console.warn(`Nothing to translate on the item ${item.name}`);
