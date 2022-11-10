@@ -1,73 +1,92 @@
-import { ComprehendLanguages } from "./ComprehendLanguages"; 
-declare const CONST, Dialog: any
-declare const game: Game
+import { ComprehendLanguages } from "./ComprehendLanguages";
+declare const CONST, Dialog: any;
+declare const game: Game;
 
 interface DeepLTranslation {
-  translations: [
-    {text: string}
-  ]
+  translations: [{ text: string }];
 }
 
 export class ComprehendLanguagesTranslator {
-  static async buttonTranslateJournalEntry(journal: JournalEntry) { 
-    const { token, target_lang} =
+  static async buttonTranslateJournalEntry(journal: JournalEntry) {
+    const { token, target_lang } =
       await ComprehendLanguagesTranslator.getTranslationSettings();
     const makeSeparateFolder = game.settings.get(
-        ComprehendLanguages.ID,
-        ComprehendLanguages.SETTINGS.SEPARATE_FOLDER
-      ) as boolean;
+      ComprehendLanguages.ID,
+      ComprehendLanguages.SETTINGS.SEPARATE_FOLDER
+    ) as boolean;
     if (!token) {
       this.dialogTokenMissing();
     } else {
-      const folder = await this.determineFolder(journal,target_lang,makeSeparateFolder)
-      const pages = journal.pages
-      const newName = makeSeparateFolder ? journal.name : target_lang + "_" + journal.name
-      const newJournalEntry = await JournalEntry.createDocuments([{...journal, name: newName, folder: folder }])
+      const folder = await this.determineFolder(
+        journal,
+        target_lang,
+        makeSeparateFolder
+      );
+      const pages = journal.pages;
+      const newName = makeSeparateFolder
+        ? journal.name
+        : target_lang + "_" + journal.name;
+      const newJournalEntry = await JournalEntry.createDocuments([
+        { ...journal, name: newName, folder: folder },
+      ]);
       const newPages = await Promise.all(
-        pages.map(async (page:JournalEntryPage) => this.translateSinglePage(page,token,target_lang))
-        )      
-      await newJournalEntry[0].createEmbeddedDocuments("JournalEntryPage",newPages.flat())
+        pages.map(async (page: JournalEntryPage) =>
+          this.translateSinglePage(page, token, target_lang)
+        )
+      );
+      await newJournalEntry[0].createEmbeddedDocuments(
+        "JournalEntryPage",
+        newPages.flat()
+      );
     }
   }
 
-  static async determineFolder(journal:JournalEntry, target_lang:string,makeSeparateFolder:boolean): Promise<Folder<EnfolderableDocument>> {
-    if(makeSeparateFolder){
-      let oldFolderName = journal.folder.name
-      var newFolderName = target_lang + "_" + oldFolderName
-      let folderType = journal.folder.type as "JournalEntry"|"Item"
+  static async determineFolder(
+    journal: JournalEntry,
+    target_lang: string,
+    makeSeparateFolder: boolean
+  ): Promise<Folder<EnfolderableDocument>> {
+    if (makeSeparateFolder) {
+      let oldFolderName = journal.folder.name;
+      var newFolderName = target_lang + "_" + oldFolderName;
+      let folderType = journal.folder.type as "JournalEntry" | "Item";
       let existingFolder = game.folders.filter((folder) => {
-        return (folder.name == newFolderName && folder.type == folderType)
-      })
-      if(existingFolder.length == 0){
-        var newFolders = await Folder.createDocuments([{name: newFolderName, type: folderType}]) 
-        var newFolder = newFolders[0] as Folder
-      }else{
-        var newFolder = existingFolder[0]
+        return folder.name == newFolderName && folder.type == folderType;
+      });
+      if (existingFolder.length == 0) {
+        var newFolders = await Folder.createDocuments([
+          { name: newFolderName, type: folderType },
+        ]);
+        var newFolder = newFolders[0] as Folder;
+      } else {
+        var newFolder = existingFolder[0];
       }
-    }else{
-      var newFolder = journal.folder
+    } else {
+      var newFolder = journal.folder;
     }
-    return newFolder
+    return newFolder;
   }
-  static async buttonTranslateItem(item: Item) { 
-    const { token, target_lang} =
+  static async buttonTranslateItem(item: Item) {
+    const { token, target_lang } =
       await ComprehendLanguagesTranslator.getTranslationSettings();
     if (!token) {
       this.dialogTokenMissing();
     } else {
       // TODO Not every system has the "description" property on system item
       //@ts-ignore
-      if(item.system.description){
-        const newName = target_lang + "_" + item.name
-        const newDescriptionText =  await this.translate_html(
+      if (item.system.description) {
+        const newName = target_lang + "_" + item.name;
+        const newDescriptionText = await this.translate_html(
           //@ts-ignore
           item.system.description.value,
           token,
           target_lang
         );
-        //@ts-ignore
-        const newItems = <Item[]>await Item.createDocuments([{ ...item, name: newName, folder: item.folder}]);
-        if(!newItems || newItems.length <= 0 ) {
+        const newItems = await Item.createDocuments([
+          //@ts-ignore
+          { ...item, name: newName, folder: item.folder },
+        ]);
+        if (!newItems || newItems.length <= 0) {
           return;
         }
         //@ts-ignore
@@ -78,7 +97,9 @@ export class ComprehendLanguagesTranslator {
         //     }newDescriptionText
         //   }
         // });
-        await newItems[0].update({system:{description:{value:newDescriptionText}}})
+        await newItems[0].update({
+          system: { description: { value: newDescriptionText } },
+        });
       } else {
         // DO NOTHING
         console.warn(`Nothing to translate on the item ${item.name}`);
@@ -86,68 +107,90 @@ export class ComprehendLanguagesTranslator {
     }
   }
 
-  private static async translateSinglePage(journalPage: JournalEntryPage, token: string, target_lang: string): Promise<JournalEntryPage> {
+  private static async translateSinglePage(
+    journalPage: JournalEntryPage,
+    token: string,
+    target_lang: string
+  ): Promise<JournalEntryPage> {
     const journalText = await this.getJournalPageText(journalPage);
     let translation = await this.translate_html(
       journalText,
       token,
       target_lang
     );
-    const newJournalPage = await this.createNewJournalEntry(journalPage, translation);
-    return newJournalPage  
+    const newJournalPage = await this.createNewJournalEntry(
+      journalPage,
+      translation
+    );
+    return newJournalPage;
   }
 
-  static async getJournalPageText(journalPage) : Promise<string> {
-    if(journalPage.text.content){
-    let text:string = journalPage.text.content;
-    text = text.replace("#", "");
-    return text;}
-    else{
-      return ''
-    } 
-    
+  static async getJournalPageText(journalPage): Promise<string> {
+    if (journalPage.text.content) {
+      let text: string = journalPage.text.content;
+      text = text.replace("#", "");
+      return text;
+    } else {
+      return "";
+    }
   }
 
-  static async translate_html(long_html:string, token:string, target_lang:string) : Promise<string> {
-    const split_html = this._split_html(long_html)
+  static async translate_html(
+    long_html: string,
+    token: string,
+    target_lang: string
+  ): Promise<string> {
+    const split_html = this._split_html(long_html);
     let translated_html = split_html.map(async (value) => {
-      if(value.startsWith("<")){
-        return value
-      }else if((value.trim().length) == 0){
-        return " "
+      if (value.startsWith("<")) {
+        return value;
+      } else if (value.trim().length == 0) {
+        return " ";
+      } else {
+        return await this.translate_text(value, token, target_lang);
       }
-        else{
-        return await this.translate_text(value, token, target_lang)
-      }
-    })
-    const full_string = await Promise.all(translated_html)
-    return full_string.join('')
+    });
+    const full_string = await Promise.all(translated_html);
+    return full_string.join("");
   }
 
-  static async createNewJournalEntry(journal: JournalEntryPage, translation:string) : Promise<any> {
+  static async createNewJournalEntry(
+    journal: JournalEntryPage,
+    translation: string
+  ): Promise<any> {
     const { token, target_lang } =
       await ComprehendLanguagesTranslator.getTranslationSettings();
-    const newJournalPage:Array<object> = [{
-      ...journal, text:{content: translation, format: CONST.JOURNAL_ENTRY_PAGE_FORMATS.HTML}
-    }]
-    return newJournalPage
-    
+    const newJournalPage: Array<object> = [
+      {
+        ...journal,
+        text: {
+          content: translation,
+          format: CONST.JOURNAL_ENTRY_PAGE_FORMATS.HTML,
+        },
+      },
+    ];
+    return newJournalPage;
   }
-  static async translate_text(text:string, token:string, target_lang:string): Promise<string> {
-    
+  static async translate_text(
+    text: string,
+    token: string,
+    target_lang: string
+  ): Promise<string> {
     // TODO Find a better method this is a retrocompatibility fix for issue #9 and fvtt 9
     let newText = duplicate(text);
-    newText = this.replaceAll(newText,`@Scene[`,`@UUID[Scene.`);
-    newText = this.replaceAll(newText,`@Actor[`,`@UUID[Actor.`);
-    newText = this.replaceAll(newText,`@Item[`,`@UUID[Item.`);
-    newText = this.replaceAll(newText,`@JournalEntry[`,`@UUID[JournalEntry.`);
-    newText = this.replaceAll(newText,`@RollTable[`,`@UUID[RollTable.`);
-    newText = this.replaceAll(newText,`@Cards[`,`@UUID[Cards.`);
-    newText = this.replaceAll(newText,`@Folder[`,`@UUID[Folder.`);
-    newText = this.replaceAll(newText,`@Playlist[`,`@UUID[Playlist.`);
-    newText = this.replaceAll(newText,`@Compendium[`,`@UUID[Compendium.`);
-    
-    let data = new URLSearchParams(`auth_key=${token}&text=${newText}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`);
+    newText = this.replaceAll(newText, `@Scene[`, `@UUID[Scene.`);
+    newText = this.replaceAll(newText, `@Actor[`, `@UUID[Actor.`);
+    newText = this.replaceAll(newText, `@Item[`, `@UUID[Item.`);
+    newText = this.replaceAll(newText, `@JournalEntry[`, `@UUID[JournalEntry.`);
+    newText = this.replaceAll(newText, `@RollTable[`, `@UUID[RollTable.`);
+    newText = this.replaceAll(newText, `@Cards[`, `@UUID[Cards.`);
+    newText = this.replaceAll(newText, `@Folder[`, `@UUID[Folder.`);
+    newText = this.replaceAll(newText, `@Playlist[`, `@UUID[Playlist.`);
+    newText = this.replaceAll(newText, `@Compendium[`, `@UUID[Compendium.`);
+
+    let data = new URLSearchParams(
+      `auth_key=${token}&text=${newText}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`
+    );
     // let translation = await fetch(
     //   "https://api-free.deepl.com/v2/translate?" + data,{
     //     mode:'cors',
@@ -160,19 +203,23 @@ export class ComprehendLanguagesTranslator {
     //   });
 
     let response = await fetch(
-      "https://api-free.deepl.com/v2/translate?" + data,{
-        method:'GET',
+      "https://api-free.deepl.com/v2/translate?" + data,
+      {
+        method: "GET",
       }
-      )
-      let translation:DeepLTranslation = await response.json()
-      return translation.translations[0].text;
+    );
+    let translation: DeepLTranslation = await response.json();
+    return translation.translations[0].text;
   }
 
   private static replaceAll(string, search, replace) {
     return string.split(search).join(replace);
   }
 
-  static async getTranslationSettings(): Promise<{token: any, target_lang:any}> {
+  static async getTranslationSettings(): Promise<{
+    token: any;
+    target_lang: any;
+  }> {
     const token = game.settings.get(
       ComprehendLanguages.ID,
       ComprehendLanguages.SETTINGS.DEEPL_TOKEN
@@ -184,9 +231,9 @@ export class ComprehendLanguagesTranslator {
     return { token, target_lang };
   }
 
-  static _split_html(input_HTML:string) {
-    let taglist:Array<number> = [];
-    let output_HTML:Array<string> = [];
+  static _split_html(input_HTML: string) {
+    let taglist: Array<number> = [];
+    let output_HTML: Array<string> = [];
     [...input_HTML].forEach(function (value, i) {
       switch (["<", ">"].indexOf(value)) {
         case -1: {
@@ -199,8 +246,8 @@ export class ComprehendLanguagesTranslator {
           taglist.push(i);
       }
     });
-    let even:Array<number> = [],
-      uneven:Array<number> = [];
+    let even: Array<number> = [],
+      uneven: Array<number> = [];
     taglist.forEach((value, index) => {
       if (index % 2 == 0) {
         even.push(value);
@@ -211,7 +258,7 @@ export class ComprehendLanguagesTranslator {
     even.forEach((start_idx, index) => {
       const end_idx = uneven[index];
       const next_start_idx = even[index + 1];
-      output_HTML.push(input_HTML.slice(start_idx, end_idx+1)); //+ 1 - start_idx));
+      output_HTML.push(input_HTML.slice(start_idx, end_idx + 1)); //+ 1 - start_idx));
       if (next_start_idx - end_idx < 2 || isNaN(next_start_idx)) {
       } else {
         output_HTML.push(
@@ -222,20 +269,22 @@ export class ComprehendLanguagesTranslator {
     return output_HTML;
   }
 
-  static _split_at_p(inputHTML:string):Array<string>{
-    let outputArray = inputHTML.split("</p>")
+  static _split_at_p(inputHTML: string): Array<string> {
+    let outputArray = inputHTML.split("</p>");
     outputArray = outputArray
-    .filter((element) => {return element.length > 0})
-    .map((element) => {
-    if(element.startsWith("<p")){
-      return(element+"</p>")
-    }else{
-      return element
-      }
-    })
-    return outputArray
+      .filter((element) => {
+        return element.length > 0;
+      })
+      .map((element) => {
+        if (element.startsWith("<p")) {
+          return element + "</p>";
+        } else {
+          return element;
+        }
+      });
+    return outputArray;
   }
-  static async dialogTokenMissing() { 
+  static async dialogTokenMissing() {
     let d = new Dialog({
       title: "DeepL Token missing",
       content:

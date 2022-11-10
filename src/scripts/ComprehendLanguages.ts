@@ -1,6 +1,6 @@
-import * as foundry from '../../types/foundry/index'
-import { addTranslateButton } from './lib';
-declare const game:Game;
+import * as foundry from "../../types/foundry/index";
+import { addTranslateButton } from "./lib";
+declare const game: Game;
 export class ComprehendLanguages {
   static ID = "comprehend-languages";
 
@@ -13,17 +13,17 @@ export class ComprehendLanguages {
     TARGET_LANG: "target-language",
     SUBSETTINGS_MENU: "subsetting-menu",
     ICON_ONLY: "iconOnly",
-    SEPARATE_FOLDER: "separate-folder"
+    SEPARATE_FOLDER: "separate-folder",
   };
 
   static log(force, ...args) {
     const shouldLog =
       force ||
-//      @ts-ignore
+      //      @ts-ignore
       game.modules.get("_dev-mode")?.api?.getPackageDebugValue(this.ID);
 
     if (shouldLog) {
-      console.log(this.ID, "|", ...args); 
+      console.log(this.ID, "|", ...args);
     }
   }
 
@@ -46,14 +46,14 @@ export class ComprehendLanguages {
       scope: "world",
     });
 
-   game.settings.register(this.ID,this.SETTINGS.SEPARATE_FOLDER,{
+    game.settings.register(this.ID, this.SETTINGS.SEPARATE_FOLDER, {
       name: "Separate Folder",
       config: true,
       hint: "If enabled the translated documents & items will be put into a separate folder.",
       type: Boolean,
       default: false,
       scope: "world",
-   })
+    });
 
     game.settings.register(this.ID, this.SETTINGS.TARGET_LANG, {
       name: "Target Language",
@@ -94,7 +94,7 @@ export class ComprehendLanguages {
     // every new application window creation event.
     const handler = {
       ownKeys: (target) => {
-        return Reflect.ownKeys(target).filter((app:any) => {
+        return Reflect.ownKeys(target).filter((app: any) => {
           const appId = parseInt(app);
           if (!isNaN(appId)) {
             // TODO DO SOMETHING ??
@@ -103,14 +103,18 @@ export class ComprehendLanguages {
           return true;
         });
       },
-      set: (obj:Record<number, Application>, prop:number, value:FormApplication) => {
+      set: (
+        obj: Record<number, Application>,
+        prop: number,
+        value: FormApplication
+      ) => {
         const result = Reflect.set(obj, prop, value);
         // console.log("Intercept ui-window create", value);
-        if (
-          value &&
-          value.object
-        ) {
-          if(value.object instanceof JournalEntry || value.object instanceof Item) {
+        if (value && value.object) {
+          if (
+            value.object instanceof JournalEntry ||
+            value.object instanceof Item
+          ) {
             addTranslateButton(value).catch((err) => console.error(err));
           }
         }
