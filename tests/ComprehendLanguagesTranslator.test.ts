@@ -61,3 +61,22 @@ test("deconstructs nested HTML", async () => {
     "</a>",
   ]);
 });
+
+test("splits text at </p> tag", async() =>{
+  const input_HTML = "<p>Hello World</p><p>I am inevitable</p>"
+  let output_HTML = ComprehendLanguagesTranslator._split_at_p(input_HTML);
+  expect(output_HTML).toStrictEqual([
+    "<p>Hello World</p>",
+    "<p>I am inevitable</p>"
+  ])
+})
+
+test("splits text at </p> tag with dangling text", async() =>{
+  const input_HTML = "<p>Hello World</p><p>I am inevitable</p>Dangle"
+  let output_HTML = ComprehendLanguagesTranslator._split_at_p(input_HTML);
+  expect(output_HTML).toStrictEqual([
+    "<p>Hello World</p>",
+    "<p>I am inevitable</p>",
+    "Dangle"
+  ])
+})

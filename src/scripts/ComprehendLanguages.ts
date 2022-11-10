@@ -12,7 +12,8 @@ export class ComprehendLanguages {
     DEEPL_TOKEN: "deepl-token",
     TARGET_LANG: "target-language",
     SUBSETTINGS_MENU: "subsetting-menu",
-    ICON_ONLY: "iconOnly"
+    ICON_ONLY: "iconOnly",
+    SEPARATE_FOLDER: "separate-folder"
   };
 
   static log(force, ...args) {
@@ -39,13 +40,20 @@ export class ComprehendLanguages {
     game.settings.register(this.ID, this.SETTINGS.ICON_ONLY, {
       name: "Icon Only",
       config: true,
-      hint: "If enabled the header button wil show with only the icon and no text",
+      hint: "If enabled the header button will show with only the icon and no text",
       type: Boolean,
       default: false,
       scope: "world",
     });
 
-   
+   game.settings.register(this.ID,this.SETTINGS.SEPARATE_FOLDER,{
+      name: "Separate Folder",
+      config: true,
+      hint: "If enabled the translated documents & items will be put into a separate folder.",
+      type: Boolean,
+      default: false,
+      scope: "world",
+   })
 
     game.settings.register(this.ID, this.SETTINGS.TARGET_LANG, {
       name: "Target Language",
@@ -95,7 +103,7 @@ export class ComprehendLanguages {
           return true;
         });
       },
-      set: (obj, prop, value) => {
+      set: (obj:Record<number, Application>, prop:number, value:FormApplication) => {
         const result = Reflect.set(obj, prop, value);
         // console.log("Intercept ui-window create", value);
         if (

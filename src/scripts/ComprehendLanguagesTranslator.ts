@@ -12,19 +12,43 @@ export class ComprehendLanguagesTranslator {
   static async buttonTranslateJournalEntry(journal: JournalEntry) { 
     const { token, target_lang} =
       await ComprehendLanguagesTranslator.getTranslationSettings();
+    const makeSeparateFolder = game.settings.get(
+        ComprehendLanguages.ID,
+        ComprehendLanguages.SETTINGS.SEPARATE_FOLDER
+      ) as boolean;
     if (!token) {
       this.dialogTokenMissing();
     } else {
+      const folder = await this.determineFolder(journal,target_lang,makeSeparateFolder)
       const pages = journal.pages
-      const newName = target_lang + "_" + journal.name
-      const newJournalEntry = await JournalEntry.createDocuments([{...journal, name: newName, folder: journal.folder}])
-      const newPages:Array<JournalEntryPage> = await Promise.all(
+      const newName = makeSeparateFolder ? journal.name : target_lang + "_" + journal.name
+      const newJournalEntry = await JournalEntry.createDocuments([{...journal, name: newName, folder: folder }])
+      const newPages = await Promise.all(
         pages.map(async (page:JournalEntryPage) => this.translateSinglePage(page,token,target_lang))
         )      
       await newJournalEntry[0].createEmbeddedDocuments("JournalEntryPage",newPages.flat())
     }
   }
 
+  static async determineFolder(journal:JournalEntry, target_lang:string,makeSeparateFolder:boolean): Promise<Folder<EnfolderableDocument>> {
+    if(makeSeparateFolder){
+      let oldFolderName = journal.folder.name
+      var newFolderName = target_lang + "_" + oldFolderName
+      let folderType = journal.folder.type as "JournalEntry"|"Item"
+      let existingFolder = game.folders.filter((folder) => {
+        return (folder.name == newFolderName && folder.type == folderType)
+      })
+      if(existingFolder.length == 0){
+        var newFolders = await Folder.createDocuments([{name: newFolderName, type: folderType}]) 
+        var newFolder = newFolders[0] as Folder
+      }else{
+        var newFolder = existingFolder[0]
+      }
+    }else{
+      var newFolder = journal.folder
+    }
+    return newFolder
+  }
   static async buttonTranslateItem(item: Item) { 
     const { token, target_lang} =
       await ComprehendLanguagesTranslator.getTranslationSettings();
@@ -62,7 +86,7 @@ export class ComprehendLanguagesTranslator {
     }
   }
 
-  private static async translateSinglePage(journalPage: JournalEntryPage, token: string, target_lang: string) {
+  private static async translateSinglePage(journalPage: JournalEntryPage, token: string, target_lang: string): Promise<JournalEntryPage> {
     const journalText = await this.getJournalPageText(journalPage);
     let translation = await this.translate_html(
       journalText,
@@ -196,6 +220,20 @@ export class ComprehendLanguagesTranslator {
       }
     });
     return output_HTML;
+  }
+
+  static _split_at_p(inputHTML:string):Array<string>{
+    let outputArray = inputHTML.split("</p>")
+    outputArray = outputArray
+    .filter((element) => {return element.length > 0})
+    .map((element) => {
+    if(element.startsWith("<p")){
+      return(element+"</p>")
+    }else{
+      return element
+      }
+    })
+    return outputArray
   }
   static async dialogTokenMissing() { 
     let d = new Dialog({
