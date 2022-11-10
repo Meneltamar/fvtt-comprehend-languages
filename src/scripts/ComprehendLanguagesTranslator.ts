@@ -158,8 +158,6 @@ export class ComprehendLanguagesTranslator {
     journal: JournalEntryPage,
     translation: string
   ): Promise<any> {
-    const { token, target_lang } =
-      await ComprehendLanguagesTranslator.getTranslationSettings();
     const newJournalPage: Array<object> = [
       {
         ...journal,
@@ -217,17 +215,17 @@ export class ComprehendLanguagesTranslator {
   }
 
   static async getTranslationSettings(): Promise<{
-    token: any;
-    target_lang: any;
+    token: string;
+    target_lang: string;
   }> {
     const token = game.settings.get(
       ComprehendLanguages.ID,
       ComprehendLanguages.SETTINGS.DEEPL_TOKEN
-    );
+    ) as string;
     const target_lang = game.settings.get(
       ComprehendLanguages.ID,
       ComprehendLanguages.SETTINGS.TARGET_LANG
-    );
+    ) as string;
     return { token, target_lang };
   }
 
