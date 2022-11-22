@@ -140,15 +140,9 @@ export class ComprehendLanguagesTranslator {
     token: string,
     target_lang: string
   ): Promise<string> {
-    const split_html = this._split_html(long_html);
+    const split_html = this._split_at_p(long_html);
     let translated_html = split_html.map(async (value) => {
-      if (value.startsWith("<")) {
-        return value;
-      } else if (value.trim().length == 0) {
-        return " ";
-      } else {
-        return await this.translate_text(value, token, target_lang);
-      }
+      return await this.translate_text(value, token, target_lang);
     });
     const full_string = await Promise.all(translated_html);
     return full_string.join("");
