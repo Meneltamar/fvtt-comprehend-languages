@@ -23,9 +23,7 @@ export class ComprehendLanguagesTranslator {
         makeSeparateFolder
       );
       const pages = journal.pages;
-      const newName = makeSeparateFolder
-        ? journal.name
-        : target_lang + "_" + journal.name;
+      const newName = target_lang + "_" + journal.name;
       const newJournalEntry = await JournalEntry.createDocuments([
         { ...journal, name: newName, folder: folder },
       ]);
@@ -47,6 +45,9 @@ export class ComprehendLanguagesTranslator {
     makeSeparateFolder: boolean
   ): Promise<Folder<EnfolderableDocument>> {
     if (makeSeparateFolder) {
+      if (!journal.folder) {
+        return null;
+      }
       let oldFolderName = journal.folder.name;
       var newFolderName = target_lang + "_" + oldFolderName;
       let folderType = journal.folder.type as "JournalEntry" | "Item";
