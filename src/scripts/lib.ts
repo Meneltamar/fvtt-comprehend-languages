@@ -187,6 +187,7 @@ export function replaceAll(string, search, replace) {
 export async function getTranslationSettings(): Promise<{
   token: string;
   target_lang: string;
+  makeSeparateFolder: boolean;
 }> {
   const token = game.settings.get(
     ComprehendLanguages.ID,
@@ -196,7 +197,11 @@ export async function getTranslationSettings(): Promise<{
     ComprehendLanguages.ID,
     ComprehendLanguages.SETTINGS.TARGET_LANG
   ) as string;
-  return { token, target_lang };
+  const makeSeparateFolder = game.settings.get(
+    ComprehendLanguages.ID,
+    ComprehendLanguages.SETTINGS.SEPARATE_FOLDER
+  ) as boolean;
+  return { token, target_lang, makeSeparateFolder };
 }
 
 export async function dialogTokenMissing() {

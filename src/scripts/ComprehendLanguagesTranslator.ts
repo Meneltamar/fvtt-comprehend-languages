@@ -1,4 +1,3 @@
-import { ComprehendLanguages } from "./ComprehendLanguages";
 import {
   _split_at_p,
   _split_html,
@@ -7,8 +6,7 @@ import {
   dialogTokenMissing,
   determineFolder,
 } from "./lib";
-declare const CONST, Dialog: any;
-declare const game: Game;
+declare const CONST: any;
 
 interface Translator<T> {
   translateButton(documentToTranslate: T): Promise<void>;
@@ -16,11 +14,8 @@ interface Translator<T> {
 
 export class JournalEntryTranslator implements Translator<JournalEntry> {
   async translateButton(documentToTranslate: JournalEntry): Promise<void> {
-    const { token, target_lang } = await getTranslationSettings();
-    const makeSeparateFolder = game.settings.get(
-      ComprehendLanguages.ID,
-      ComprehendLanguages.SETTINGS.SEPARATE_FOLDER
-    ) as boolean;
+    const { token, target_lang, makeSeparateFolder } =
+      await getTranslationSettings();
     if (!token) {
       dialogTokenMissing();
     } else {
@@ -60,7 +55,7 @@ export class JournalEntryTranslator implements Translator<JournalEntry> {
     return newJournalPage;
   }
 
-  async getJournalPageText(journalPage): Promise<string> {
+  private async getJournalPageText(journalPage): Promise<string> {
     if (journalPage.text.content) {
       let text: string = journalPage.text.content;
       text = text.replace("#", "");
@@ -70,7 +65,7 @@ export class JournalEntryTranslator implements Translator<JournalEntry> {
     }
   }
 
-  async createNewJournalEntry(
+  private async createNewJournalEntry(
     journal: JournalEntryPage,
     translation: string
   ): Promise<any> {
@@ -134,6 +129,7 @@ export class ItemTranslator implements Translator<Item> {
     }
   }
 }
+
 export class ComprehendLanguagesTranslator {
   static async buttonTranslateJournalEntry(journal: JournalEntry) {
     const translator = new JournalEntryTranslator();
