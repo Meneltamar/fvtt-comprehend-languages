@@ -1,4 +1,7 @@
-import { ComprehendLanguagesTranslator } from "./ComprehendLanguagesTranslator";
+import {
+  ComprehendLanguagesTranslator,
+  Translator,
+} from "./ComprehendLanguagesTranslator";
 import { ComprehendLanguages } from "./ComprehendLanguages";
 interface DeepLTranslation {
   translations: [{ text: string }];
@@ -221,17 +224,17 @@ export async function dialogTokenMissing() {
 }
 
 export async function determineFolder(
-  journal: JournalEntry | Item,
+  translatable: JournalEntry | Item,
   target_lang: string,
   makeSeparateFolder: boolean
 ): Promise<Folder<EnfolderableDocument>> {
   if (makeSeparateFolder) {
-    if (!journal.folder) {
+    if (!translatable.folder) {
       return null;
     }
-    let oldFolderName = journal.folder.name;
+    let oldFolderName = translatable.folder.name;
     var newFolderName = target_lang + "_" + oldFolderName;
-    let folderType = journal.folder.type as "JournalEntry" | "Item";
+    let folderType = translatable.folder.type as "JournalEntry" | "Item";
     let existingFolder = game.folders.filter((folder) => {
       return folder.name == newFolderName && folder.type == folderType;
     });
@@ -244,7 +247,7 @@ export async function determineFolder(
       var newFolder = existingFolder[0];
     }
   } else {
-    var newFolder = journal.folder;
+    var newFolder = translatable.folder;
   }
   return newFolder;
 }

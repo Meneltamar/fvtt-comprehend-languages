@@ -1,5 +1,7 @@
 import * as foundry from "../../types/foundry/index";
+import { SelectionTranslator } from "./ComprehendLanguagesTranslator";
 import { addTranslateButton } from "./lib";
+
 declare const game: Game;
 export class ComprehendLanguages {
   static ID = "comprehend-languages";
@@ -90,6 +92,15 @@ export class ComprehendLanguages {
       scope: "world",
     });
 
+    game.keybindings.register(this.ID, "translate-highlighted-text", {
+      name: "Translate highlighted text",
+      hint: "Translate the currently selected piece of text and pop it out into a Dialog",
+      editable: [{ key: "KeyT", modifiers: ["Alt"] }],
+      onDown: () => {
+        SelectionTranslator.translateSelectedText();
+        return true;
+      },
+    });
     // We replace the games window registry with a proxy object so we can intercept
     // every new application window creation event.
     const handler = {

@@ -8,7 +8,7 @@ import {
 } from "./lib";
 declare const CONST: any;
 
-interface Translator<T> {
+export interface Translator<T> {
   translateButton(documentToTranslate: T): Promise<void>;
 }
 
@@ -84,7 +84,8 @@ export class JournalEntryTranslator implements Translator<JournalEntry> {
 
 export class ItemTranslator implements Translator<Item> {
   async translateButton(documentToTranslate: Item): Promise<void> {
-    const { token, target_lang } = await getTranslationSettings();
+    const { token, target_lang, makeSeparateFolder } =
+      await getTranslationSettings();
     if (!token) {
       dialogTokenMissing();
     } else {
@@ -98,12 +99,17 @@ export class ItemTranslator implements Translator<Item> {
           token,
           target_lang
         );
+        const newFolder = await determineFolder(
+          documentToTranslate,
+          target_lang,
+          makeSeparateFolder
+        );
         const newItems = await Item.createDocuments([
           //@ts-ignore
           {
             ...documentToTranslate,
             name: newName,
-            folder: documentToTranslate.folder,
+            folder: newFolder,
           },
         ]);
         if (!newItems || newItems.length <= 0) {
@@ -139,5 +145,30 @@ export class ComprehendLanguagesTranslator {
   static async buttonTranslateItem(item: Item) {
     const translator = new ItemTranslator();
     translator.translateButton(item);
+  }
+}
+
+export class SelectionTranslator {
+  static async translateSelectedText() {
+    const { token, target_lang, makeSeparateFolder } =
+      await getTranslationSettings();
+    const selectedText = window.getSelection().toString();
+    const translatedText = await translate_html(
+      selectedText,
+      token,
+      target_lang
+    );
+    let d = new Dialog({
+      title: "Translation",
+      content: `<p>${translatedText}</p>`,
+      buttons: {
+        one: {
+          icon: '<i class="fas fa-check"></i>',
+          label: "Close Translation",
+        },
+      },
+      default: "one",
+    });
+    d.render(true);
   }
 }
