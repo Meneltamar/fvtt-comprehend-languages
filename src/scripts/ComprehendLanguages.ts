@@ -16,6 +16,8 @@ export class ComprehendLanguages {
     SUBSETTINGS_MENU: "subsetting-menu",
     ICON_ONLY: "iconOnly",
     SEPARATE_FOLDER: "separate-folder",
+    TRANSLATE_FOLDER_NAME: "translate-folder-name",
+    TRANSLATE_JOURNAL_NAME: "translate-journal-name",
   };
 
   static log(force, ...args) {
@@ -52,6 +54,24 @@ export class ComprehendLanguages {
       name: "Separate Folder",
       config: true,
       hint: "If enabled the translated documents & items will be put into a separate folder.",
+      type: Boolean,
+      default: false,
+      scope: "world",
+    });
+
+    game.settings.register(this.ID, this.SETTINGS.TRANSLATE_FOLDER_NAME, {
+      name: "Translate Folder Name",
+      config: true,
+      hint: "If enabled together with the *Separate Folder* setting, the name of the folder will be translated as well.",
+      type: Boolean,
+      default: false,
+      scope: "world",
+    });
+
+    game.settings.register(this.ID, this.SETTINGS.TRANSLATE_JOURNAL_NAME, {
+      name: "Translate Document Names",
+      config: true,
+      hint: "If enabled the names of Journals, Journal Pages and Items will be translated as well and the language prefix omitted.",
       type: Boolean,
       default: false,
       scope: "world",

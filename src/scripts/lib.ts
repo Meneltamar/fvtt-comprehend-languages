@@ -1,9 +1,5 @@
-import {
-  ComprehendLanguagesTranslator,
-  Translator,
-} from "./ComprehendLanguagesTranslator";
+import { ComprehendLanguagesTranslator } from "./ComprehendLanguagesTranslator";
 import { ComprehendLanguages } from "./ComprehendLanguages";
-import { ErrorDialog } from "./ErrorDialog";
 export interface DeepLTranslation {
   translations: [{ text: string }];
 }
@@ -234,7 +230,26 @@ export async function determineFolder(
       return null;
     }
     let oldFolderName = translatable.folder.name;
-    var newFolderName = target_lang + "_" + oldFolderName;
+    if (
+      game.settings.get(
+        ComprehendLanguages.ID,
+        ComprehendLanguages.SETTINGS.TRANSLATE_FOLDER_NAME
+      )
+    ) {
+      var newFolderName = await translate_text(
+        oldFolderName,
+        game.settings.get(
+          ComprehendLanguages.ID,
+          ComprehendLanguages.SETTINGS.DEEPL_TOKEN
+        ) as string,
+        game.settings.get(
+          ComprehendLanguages.ID,
+          ComprehendLanguages.SETTINGS.TARGET_LANG
+        ) as string
+      );
+    } else {
+      var newFolderName = target_lang + "_" + oldFolderName;
+    }
     let folderType = translatable.folder.type as "JournalEntry" | "Item";
     let existingFolder = game.folders.filter((folder) => {
       return folder.name == newFolderName && folder.type == folderType;
@@ -251,4 +266,30 @@ export async function determineFolder(
     var newFolder = translatable.folder;
   }
   return newFolder;
+}
+
+export async function determineNewName(
+  documentToTranslate: JournalEntry | JournalEntryPage | Item
+) {
+  const { token, target_lang, makeSeparateFolder } =
+    await getTranslationSettings();
+  let newName: string;
+  if (
+    game.settings.get(
+      ComprehendLanguages.ID,
+      ComprehendLanguages.SETTINGS.TRANSLATE_JOURNAL_NAME
+    )
+  ) {
+    newName = await translate_text(
+      documentToTranslate.name,
+      token,
+      target_lang
+    );
+  } else {
+    if (documentToTranslate instanceof JournalEntryPage) {
+      return documentToTranslate.name;
+    }
+    newName = target_lang + "_" + documentToTranslate.name;
+  }
+  return newName;
 }

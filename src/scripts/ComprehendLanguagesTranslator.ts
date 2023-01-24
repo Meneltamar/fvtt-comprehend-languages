@@ -1,3 +1,4 @@
+import { ComprehendLanguages } from "./ComprehendLanguages";
 import { ErrorDialog } from "./ErrorDialog";
 import {
   _split_at_p,
@@ -6,9 +7,11 @@ import {
   getTranslationSettings,
   dialogTokenMissing,
   determineFolder,
+  translate_text,
+  determineNewName,
 } from "./lib";
 declare const CONST: any;
-
+declare const game: Game;
 export interface Translator<T> {
   translateButton(documentToTranslate: T): Promise<void>;
 }
@@ -26,7 +29,7 @@ export class JournalEntryTranslator implements Translator<JournalEntry> {
         makeSeparateFolder
       );
       const pages = documentToTranslate.pages;
-      const newName = target_lang + "_" + documentToTranslate.name;
+      let newName: string = await determineNewName(documentToTranslate);
       const newPages = await Promise.all(
         pages.map(async (page: JournalEntryPage) =>
           this.translateSinglePage(page, token, target_lang)
@@ -74,9 +77,11 @@ export class JournalEntryTranslator implements Translator<JournalEntry> {
     journal: JournalEntryPage,
     translation: string
   ): Promise<any> {
+    const newName = await determineNewName(journal);
     const newJournalPage: Array<object> = [
       {
         ...journal,
+        name: newName,
         text: {
           content: translation,
           format: CONST.JOURNAL_ENTRY_PAGE_FORMATS.HTML,
@@ -97,7 +102,7 @@ export class ItemTranslator implements Translator<Item> {
       // TODO Not every system has the "description" property on system item
       //@ts-ignore
       if (documentToTranslate.system.description) {
-        const newName = target_lang + "_" + documentToTranslate.name;
+        let newName: string = await determineNewName(documentToTranslate);
         const newDescriptionText = await translate_html(
           //@ts-ignore
           documentToTranslate.system.description.value,
