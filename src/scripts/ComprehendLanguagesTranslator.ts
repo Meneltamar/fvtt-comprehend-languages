@@ -1,3 +1,4 @@
+import { ErrorDialog } from "./ErrorDialog";
 import {
   _split_at_p,
   _split_html,
@@ -26,18 +27,22 @@ export class JournalEntryTranslator implements Translator<JournalEntry> {
       );
       const pages = documentToTranslate.pages;
       const newName = target_lang + "_" + documentToTranslate.name;
-      const newJournalEntry = await JournalEntry.createDocuments([
-        { ...documentToTranslate, name: newName, folder: folder },
-      ]);
       const newPages = await Promise.all(
         pages.map(async (page: JournalEntryPage) =>
           this.translateSinglePage(page, token, target_lang)
         )
-      );
-      await newJournalEntry[0].createEmbeddedDocuments(
-        "JournalEntryPage",
-        newPages.flat()
-      );
+      ).catch((e) => {
+        new ErrorDialog(e.message);
+      });
+      if (newPages) {
+        const newJournalEntry = await JournalEntry.createDocuments([
+          { ...documentToTranslate, name: newName, folder: folder },
+        ]);
+        await newJournalEntry[0].createEmbeddedDocuments(
+          "JournalEntryPage",
+          newPages.flat()
+        );
+      }
     }
   }
 
@@ -98,18 +103,23 @@ export class ItemTranslator implements Translator<Item> {
           documentToTranslate.system.description.value,
           token,
           target_lang
-        );
+        ).catch((e) => {
+          new ErrorDialog(e.message);
+        });
+        if (!newDescriptionText) {
+          return;
+        }
         const newFolder = await determineFolder(
           documentToTranslate,
           target_lang,
           makeSeparateFolder
         );
         const newItems = await Item.createDocuments([
-          //@ts-ignore
           {
             ...documentToTranslate,
             name: newName,
             folder: newFolder,
+            type: documentToTranslate.type,
           },
         ]);
         if (!newItems || newItems.length <= 0) {
@@ -157,7 +167,12 @@ export class SelectionTranslator {
       selectedText,
       token,
       target_lang
-    );
+    ).catch((e) => {
+      new ErrorDialog(e.message);
+    });
+    if (!translatedText) {
+      return;
+    }
     let d = new Dialog({
       title: "Translation",
       content: `<p>${translatedText}</p>`,

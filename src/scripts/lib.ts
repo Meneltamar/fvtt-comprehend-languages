@@ -3,7 +3,8 @@ import {
   Translator,
 } from "./ComprehendLanguagesTranslator";
 import { ComprehendLanguages } from "./ComprehendLanguages";
-interface DeepLTranslation {
+import { ErrorDialog } from "./ErrorDialog";
+export interface DeepLTranslation {
   translations: [{ text: string }];
 }
 declare const Hooks: any;
@@ -148,7 +149,7 @@ export async function translate_text(
   target_lang: string
 ): Promise<string> {
   // TODO Find a better method this is a retrocompatibility fix for issue #9 and fvtt 9
-  let newText = duplicate(text);
+  let newText = text;
   newText = replaceAll(newText, `@Scene[`, `@UUID[Scene.`);
   newText = replaceAll(newText, `@Actor[`, `@UUID[Actor.`);
   newText = replaceAll(newText, `@Item[`, `@UUID[Item.`);
@@ -162,16 +163,6 @@ export async function translate_text(
   let data = new URLSearchParams(
     `auth_key=${token}&text=${newText}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`
   );
-  // let translation = await fetch(
-  //   "https://api-free.deepl.com/v2/translate?" + data,{
-  //     mode:'cors',
-  //     method:'POST',
-  //   }
-  // )
-  //   .then((response) => response.json())
-  //   .then((respText) => {
-  //     return respText;
-  //   });
 
   let response = await fetch(
     "https://api-free.deepl.com/v2/translate?" + data,
@@ -179,8 +170,18 @@ export async function translate_text(
       method: "GET",
     }
   );
-  let translation: DeepLTranslation = await response.json();
-  return translation.translations[0].text;
+  if (response.status == 200) {
+    let translation: DeepLTranslation = await response.json();
+    return translation.translations[0].text;
+  } else if (response.status == 456) {
+    throw new Error(
+      "You have exceeded your monthly DeepL API quota. You will be able to continue translating next month. For more information, check your account on the DeepL website."
+    );
+  } else if (response.status == 401 || response.status == 403) {
+    throw new Error("Your token is invalid. Please check your DeepL Token.");
+  } else {
+    throw new Error("Unknown Error");
+  }
 }
 
 export function replaceAll(string, search, replace) {
