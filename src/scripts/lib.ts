@@ -161,7 +161,7 @@ export async function translate_text(
   );
 
   let response = await fetch(
-    "https://api-free.deepl.com/v2/translate?" + data,
+    encodeURI("https://api-free.deepl.com/v2/translate?" + data),
     {
       method: "GET",
     }
