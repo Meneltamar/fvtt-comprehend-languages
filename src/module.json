@@ -1,13 +1,13 @@
 {
-  "name": "comprehend-languages",
+  "id": "comprehend-languages",
   "title": "Comprehend Languages",
   "description": "",
   "version": "This is auto replaced",
   "library": "false",
   "manifestPlusVersion": "1.0.0",
   "compatibility":{
-    "minimum": "10",
-    "verified": "10.284"
+    "minimum": "11",
+    "verified": "11.302"
   },
   "authors": [
     {
