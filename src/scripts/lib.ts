@@ -1,5 +1,6 @@
 import { ComprehendLanguagesTranslator } from "./ComprehendLanguagesTranslator";
 import { ComprehendLanguages } from "./ComprehendLanguages";
+import { ComprehendLanguagesStatic } from "./statics";
 export interface DeepLTranslation {
   translations: [{ text: string }];
 }
@@ -192,16 +193,16 @@ export async function getTranslationSettings(): Promise<{
   makeSeparateFolder: boolean;
 }> {
   const token = game.settings.get(
-    ComprehendLanguages.ID,
-    ComprehendLanguages.SETTINGS.DEEPL_TOKEN
+    ComprehendLanguagesStatic.ID,
+    ComprehendLanguagesStatic.SETTINGS.DEEPL_TOKEN
   ) as string;
   const target_lang = game.settings.get(
-    ComprehendLanguages.ID,
-    ComprehendLanguages.SETTINGS.TARGET_LANG
+    ComprehendLanguagesStatic.ID,
+    ComprehendLanguagesStatic.SETTINGS.TARGET_LANG
   ) as string;
   const makeSeparateFolder = game.settings.get(
-    ComprehendLanguages.ID,
-    ComprehendLanguages.SETTINGS.SEPARATE_FOLDER
+    ComprehendLanguagesStatic.ID,
+    ComprehendLanguagesStatic.SETTINGS.SEPARATE_FOLDER
   ) as boolean;
   return { token, target_lang, makeSeparateFolder };
 }
@@ -234,19 +235,19 @@ export async function determineFolder(
     let oldFolderName = translatable.folder.name;
     if (
       game.settings.get(
-        ComprehendLanguages.ID,
-        ComprehendLanguages.SETTINGS.TRANSLATE_FOLDER_NAME
+        ComprehendLanguagesStatic.ID,
+        ComprehendLanguagesStatic.SETTINGS.TRANSLATE_FOLDER_NAME
       )
     ) {
       var newFolderName = await translate_text(
         oldFolderName,
         game.settings.get(
-          ComprehendLanguages.ID,
-          ComprehendLanguages.SETTINGS.DEEPL_TOKEN
+          ComprehendLanguagesStatic.ID,
+          ComprehendLanguagesStatic.SETTINGS.DEEPL_TOKEN
         ) as string,
         game.settings.get(
-          ComprehendLanguages.ID,
-          ComprehendLanguages.SETTINGS.TARGET_LANG
+          ComprehendLanguagesStatic.ID,
+          ComprehendLanguagesStatic.SETTINGS.TARGET_LANG
         ) as string
       );
     } else {
@@ -278,8 +279,8 @@ export async function determineNewName(
   let newName: string;
   if (
     game.settings.get(
-      ComprehendLanguages.ID,
-      ComprehendLanguages.SETTINGS.TRANSLATE_JOURNAL_NAME
+      ComprehendLanguagesStatic.ID,
+      ComprehendLanguagesStatic.SETTINGS.TRANSLATE_JOURNAL_NAME
     )
   ) {
     newName = await translate_text(
