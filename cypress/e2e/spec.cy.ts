@@ -8,6 +8,34 @@ const mockTranslation = {
   translations: [{ text: "Translated Text" }],
 };
 
+async function prepareSettings(
+  win: Window,
+  separateFolder: boolean = false,
+  translateFolderName: boolean = false,
+  translateJournalName: boolean = false,
+  inPlace: boolean = false
+) {
+  await win.game.settings.set(
+    ComprehendLanguagesStatic.ID,
+    ComprehendLanguagesStatic.SETTINGS.SEPARATE_FOLDER,
+    separateFolder
+  );
+  await win.game.settings.set(
+    ComprehendLanguagesStatic.ID,
+    ComprehendLanguagesStatic.SETTINGS.TRANSLATE_JOURNAL_NAME,
+    translateFolderName
+  );
+  await win.game.settings.set(
+    ComprehendLanguagesStatic.ID,
+    ComprehendLanguagesStatic.SETTINGS.TRANSLATE_FOLDER_NAME,
+    translateJournalName
+  );
+  await win.game.settings.set(
+    ComprehendLanguagesStatic.ID,
+    ComprehendLanguagesStatic.SETTINGS.IN_PLACE,
+    inPlace
+  );
+}
 describe("Basic Translation flow", () => {
   beforeEach(() => {
     cy.intercept("GET", "https://api-free.deepl.com/v2/translate*", {
@@ -25,27 +53,8 @@ describe("Basic Translation flow", () => {
   });
   it("Translates root level documents", () => {
     cy.wait(1500);
-    cy.window().then((win) => {
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.SEPARATE_FOLDER,
-        false
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.TRANSLATE_JOURNAL_NAME,
-        false
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.TRANSLATE_FOLDER_NAME,
-        false
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.IN_PLACE,
-        false
-      );
+    cy.window().then(async (win) => {
+      await prepareSettings(win, false, false, false, false);
     });
     cy.get(".error > .close").click();
     cy.get(".warning > .close").click();
@@ -67,27 +76,8 @@ describe("Basic Translation flow", () => {
   it("Translates documents in folders with the separate-folder setting false", () => {
     cy.wait(1500);
     cy.contains("TestFolder").click();
-    cy.window().then((win) => {
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.SEPARATE_FOLDER,
-        false
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.TRANSLATE_JOURNAL_NAME,
-        false
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.TRANSLATE_FOLDER_NAME,
-        false
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.IN_PLACE,
-        false
-      );
+    cy.window().then(async (win) => {
+      await prepareSettings(win, false, false, false, false);
     });
     cy.get(".error > .close").click();
     cy.get(".warning > .close").click();
@@ -107,27 +97,8 @@ describe("Basic Translation flow", () => {
   it("Translates documents in folders with the separate-folder setting true", () => {
     cy.wait(1500);
     cy.contains("TestFolder").click();
-    cy.window().then((win) => {
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.SEPARATE_FOLDER,
-        true
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.TRANSLATE_JOURNAL_NAME,
-        false
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.TRANSLATE_FOLDER_NAME,
-        false
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.IN_PLACE,
-        false
-      );
+    cy.window().then(async (win) => {
+      await prepareSettings(win, true, false, false, false);
     });
     cy.get(".error > .close").click();
     cy.get(".warning > .close").click();
@@ -151,27 +122,8 @@ describe("Basic Translation flow", () => {
   it("Translates documents in folders with the separate-folder setting false and translate-journal-name true", () => {
     cy.wait(1500);
     cy.contains("TestFolder").click();
-    cy.window().then((win) => {
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.SEPARATE_FOLDER,
-        false
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.TRANSLATE_JOURNAL_NAME,
-        true
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.TRANSLATE_FOLDER_NAME,
-        false
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.IN_PLACE,
-        false
-      );
+    cy.window().then(async (win) => {
+      await prepareSettings(win, false, true, false, false);
     });
     cy.get(".error > .close").click();
     cy.get(".warning > .close").click();
@@ -191,27 +143,8 @@ describe("Basic Translation flow", () => {
   it("Translates documents in folders with the separate-folder setting true and the translate-folder setting true", () => {
     cy.wait(1500);
     cy.contains("TestFolder").click();
-    cy.window().then((win) => {
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.SEPARATE_FOLDER,
-        true
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.TRANSLATE_JOURNAL_NAME,
-        false
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.TRANSLATE_FOLDER_NAME,
-        true
-      );
-      win.game.settings.set(
-        ComprehendLanguagesStatic.ID,
-        ComprehendLanguagesStatic.SETTINGS.IN_PLACE,
-        false
-      );
+    cy.window().then(async (win) => {
+      await prepareSettings(win, true, false, true, false);
     });
     cy.get(".error > .close").click();
     cy.get(".warning > .close").click();
@@ -229,6 +162,27 @@ describe("Basic Translation flow", () => {
     cy.get(".close > .fas").click();
     cy.contains("Translated Text").rightclick();
     cy.contains("Delete All").click();
+    cy.contains("Yes").click();
+  });
+
+  it("Translate documents in the root with the inplace setting true", () => {
+    cy.wait(1500);
+    cy.window().then(async (win) => {
+      await prepareSettings(win, false, false, false, true);
+    });
+    cy.get(".error > .close").click();
+    cy.get(".warning > .close").click();
+    cy.contains("InPlace").rightclick();
+    cy.contains("Duplicate").click();
+    cy.wait(100);
+    cy.contains("InPlace (Copy)").click();
+    cy.get("[id^=comprehend-languages_]").click();
+    cy.wait(1000);
+    cy.get(".journal-page-content").should("contain.text", "Translated Text");
+    cy.get(".close > .fas").click();
+    /* ==== End Cypress Studio ==== */
+    cy.contains("InPlace (Copy)").rightclick();
+    cy.contains("Delete").click();
     cy.contains("Yes").click();
   });
 });
