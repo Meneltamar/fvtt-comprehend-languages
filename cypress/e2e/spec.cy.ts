@@ -41,6 +41,11 @@ describe("Basic Translation flow", () => {
         ComprehendLanguagesStatic.SETTINGS.TRANSLATE_FOLDER_NAME,
         false
       );
+      win.game.settings.set(
+        ComprehendLanguagesStatic.ID,
+        ComprehendLanguagesStatic.SETTINGS.IN_PLACE,
+        false
+      );
     });
     cy.get(".error > .close").click();
     cy.get(".warning > .close").click();
@@ -78,6 +83,11 @@ describe("Basic Translation flow", () => {
         ComprehendLanguagesStatic.SETTINGS.TRANSLATE_FOLDER_NAME,
         false
       );
+      win.game.settings.set(
+        ComprehendLanguagesStatic.ID,
+        ComprehendLanguagesStatic.SETTINGS.IN_PLACE,
+        false
+      );
     });
     cy.get(".error > .close").click();
     cy.get(".warning > .close").click();
@@ -111,6 +121,11 @@ describe("Basic Translation flow", () => {
       win.game.settings.set(
         ComprehendLanguagesStatic.ID,
         ComprehendLanguagesStatic.SETTINGS.TRANSLATE_FOLDER_NAME,
+        false
+      );
+      win.game.settings.set(
+        ComprehendLanguagesStatic.ID,
+        ComprehendLanguagesStatic.SETTINGS.IN_PLACE,
         false
       );
     });
@@ -152,6 +167,11 @@ describe("Basic Translation flow", () => {
         ComprehendLanguagesStatic.SETTINGS.TRANSLATE_FOLDER_NAME,
         false
       );
+      win.game.settings.set(
+        ComprehendLanguagesStatic.ID,
+        ComprehendLanguagesStatic.SETTINGS.IN_PLACE,
+        false
+      );
     });
     cy.get(".error > .close").click();
     cy.get(".warning > .close").click();
@@ -186,6 +206,11 @@ describe("Basic Translation flow", () => {
         ComprehendLanguagesStatic.ID,
         ComprehendLanguagesStatic.SETTINGS.TRANSLATE_FOLDER_NAME,
         true
+      );
+      win.game.settings.set(
+        ComprehendLanguagesStatic.ID,
+        ComprehendLanguagesStatic.SETTINGS.IN_PLACE,
+        false
       );
     });
     cy.get(".error > .close").click();

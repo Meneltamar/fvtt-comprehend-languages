@@ -100,6 +100,19 @@ export class ComprehendLanguages {
 
     game.settings.register(
       ComprehendLanguagesStatic.ID,
+      ComprehendLanguagesStatic.SETTINGS.IN_PLACE,
+      {
+        name: "Translate In Place (Overwriting the original)",
+        config: true,
+        hint: "If enabled the original document will be overwritten with the translated text.",
+        type: Boolean,
+        default: false,
+        scope: "world",
+      }
+    );
+
+    game.settings.register(
+      ComprehendLanguagesStatic.ID,
       ComprehendLanguagesStatic.SETTINGS.TARGET_LANG,
       {
         name: "Target Language",

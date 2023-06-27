@@ -13,5 +13,6 @@ export class ComprehendLanguagesStatic {
     SEPARATE_FOLDER: "separate-folder",
     TRANSLATE_FOLDER_NAME: "translate-folder-name",
     TRANSLATE_JOURNAL_NAME: "translate-journal-name",
+    IN_PLACE: "in-place",
   };
 }

@@ -191,6 +191,7 @@ export async function getTranslationSettings(): Promise<{
   token: string;
   target_lang: string;
   makeSeparateFolder: boolean;
+  translateInPlace: boolean;
 }> {
   const token = game.settings.get(
     ComprehendLanguagesStatic.ID,
@@ -204,7 +205,11 @@ export async function getTranslationSettings(): Promise<{
     ComprehendLanguagesStatic.ID,
     ComprehendLanguagesStatic.SETTINGS.SEPARATE_FOLDER
   ) as boolean;
-  return { token, target_lang, makeSeparateFolder };
+  const translateInPlace = game.settings.get(
+    ComprehendLanguagesStatic.ID,
+    ComprehendLanguagesStatic.SETTINGS.IN_PLACE
+  ) as boolean;
+  return { token, target_lang, makeSeparateFolder, translateInPlace };
 }
 
 export async function dialogTokenMissing() {

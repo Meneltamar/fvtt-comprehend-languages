@@ -18,34 +18,74 @@ export interface Translator<T> {
 
 export class JournalEntryTranslator implements Translator<JournalEntry> {
   async translateButton(documentToTranslate: JournalEntry): Promise<void> {
-    const { token, target_lang, makeSeparateFolder } =
+    const { token, target_lang, makeSeparateFolder, translateInPlace } =
       await getTranslationSettings();
     if (!token) {
       dialogTokenMissing();
     } else {
-      const folder = await determineFolder(
-        documentToTranslate,
-        target_lang,
-        makeSeparateFolder
-      );
-      const pages = documentToTranslate.pages;
-      let newName: string = await determineNewName(documentToTranslate);
-      const newPages = await Promise.all(
-        pages.map(async (page: JournalEntryPage) =>
-          this.translateSinglePage(page, token, target_lang)
-        )
-      ).catch((e) => {
-        new ErrorDialog(e.message);
-      });
-      if (newPages) {
-        const newJournalEntry = await JournalEntry.createDocuments([
-          { ...documentToTranslate, name: newName, folder: folder },
-        ]);
-        await newJournalEntry[0].createEmbeddedDocuments(
-          "JournalEntryPage",
-          newPages.flat()
+      if (!translateInPlace) {
+        await this.translateAndCreateJournalEntry(
+          documentToTranslate,
+          target_lang,
+          makeSeparateFolder,
+          token
+        );
+      } else {
+        await this.translateAndReplaceOriginal(
+          documentToTranslate,
+          target_lang,
+          token
         );
       }
+    }
+  }
+
+  private async translateAndReplaceOriginal(
+    documentToTranslate: JournalEntry,
+    target_lang: string,
+    token: string
+  ) {
+    const pages = documentToTranslate.pages;
+    pages.map(async (page: JournalEntryPage) => {
+      const journalText = await this.getJournalPageText(page);
+      let translation = await translate_html(journalText, token, target_lang);
+      await page.update({
+        text: {
+          content: translation,
+          format: CONST.JOURNAL_ENTRY_PAGE_FORMATS.HTML,
+        },
+      });
+    });
+  }
+
+  private async translateAndCreateJournalEntry(
+    documentToTranslate: JournalEntry,
+    target_lang: string,
+    makeSeparateFolder: boolean,
+    token: string
+  ) {
+    const folder = await determineFolder(
+      documentToTranslate,
+      target_lang,
+      makeSeparateFolder
+    );
+    const pages = documentToTranslate.pages;
+    let newName: string = await determineNewName(documentToTranslate);
+    const newPages = await Promise.all(
+      pages.map(async (page: JournalEntryPage) =>
+        this.translateSinglePage(page, token, target_lang)
+      )
+    ).catch((e) => {
+      new ErrorDialog(e.message);
+    });
+    if (newPages) {
+      const newJournalEntry = await JournalEntry.createDocuments([
+        { ...documentToTranslate, name: newName, folder: folder },
+      ]);
+      await newJournalEntry[0].createEmbeddedDocuments(
+        "JournalEntryPage",
+        newPages.flat()
+      );
     }
   }
 
