@@ -134,7 +134,7 @@ export class JournalEntryTranslator implements Translator<JournalEntry> {
 
 export class ItemTranslator implements Translator<Item> {
   async translateButton(documentToTranslate: Item): Promise<void> {
-    const { token, target_lang, makeSeparateFolder } =
+    const { token, target_lang, makeSeparateFolder, translateInPlace } =
       await getTranslationSettings();
     if (!token) {
       dialogTokenMissing();
@@ -142,45 +142,20 @@ export class ItemTranslator implements Translator<Item> {
       // TODO Not every system has the "description" property on system item
       //@ts-ignore
       if (documentToTranslate.system.description) {
-        let newName: string = await determineNewName(documentToTranslate);
-        const newDescriptionText = await translate_html(
-          //@ts-ignore
-          documentToTranslate.system.description.value,
-          token,
-          target_lang
-        ).catch((e) => {
-          new ErrorDialog(e.message);
-        });
-        if (!newDescriptionText) {
-          return;
+        if (!translateInPlace) {
+          await this.translateAndCreateItem(
+            documentToTranslate,
+            token,
+            target_lang,
+            makeSeparateFolder
+          );
+        } else {
+          await this.translateAndReplaceOriginal(
+            documentToTranslate,
+            token,
+            target_lang
+          );
         }
-        const newFolder = await determineFolder(
-          documentToTranslate,
-          target_lang,
-          makeSeparateFolder
-        );
-        const newItems = await Item.createDocuments([
-          {
-            ...documentToTranslate,
-            name: newName,
-            folder: newFolder,
-            type: documentToTranslate.type,
-          },
-        ]);
-        if (!newItems || newItems.length <= 0) {
-          return;
-        }
-        //@ts-ignore
-        // await newItems[0].update({
-        //   system: {
-        //     description: {
-        //       value:
-        //     }newDescriptionText
-        //   }
-        // });
-        await newItems[0].update({
-          system: { description: { value: newDescriptionText } },
-        });
       } else {
         // DO NOTHING
         console.warn(
@@ -188,6 +163,68 @@ export class ItemTranslator implements Translator<Item> {
         );
       }
     }
+  }
+  private async translateAndReplaceOriginal(
+    documentToTranslate: Item,
+    token: string,
+    target_lang: string
+  ) {
+    const newDescriptionText = await translate_html(
+      //@ts-ignore
+      documentToTranslate.system.description.value,
+      token,
+      target_lang
+    ).catch((e) => {
+      new ErrorDialog(e.message);
+    });
+    documentToTranslate.update({
+      system: { description: { value: newDescriptionText } },
+    });
+  }
+
+  private async translateAndCreateItem(
+    documentToTranslate: Item,
+    token: string,
+    target_lang: string,
+    makeSeparateFolder: boolean
+  ) {
+    let newName: string = await determineNewName(documentToTranslate);
+    const newDescriptionText = await translate_html(
+      //@ts-ignore
+      documentToTranslate.system.description.value,
+      token,
+      target_lang
+    ).catch((e) => {
+      new ErrorDialog(e.message);
+    });
+    if (!newDescriptionText) {
+    }
+    const newFolder = await determineFolder(
+      documentToTranslate,
+      target_lang,
+      makeSeparateFolder
+    );
+    const newItems = await Item.createDocuments([
+      {
+        ...documentToTranslate,
+        name: newName,
+        folder: newFolder,
+        type: documentToTranslate.type,
+      },
+    ]);
+    if (!newItems || newItems.length <= 0) {
+    }
+    //@ts-ignore
+    // await newItems[0].update({
+    //   system: {
+    //     description: {
+    //       value:
+    //     }newDescriptionText
+    //   }
+    // });
+    await newItems[0].update({
+      system: { description: { value: newDescriptionText } },
+    });
   }
 }
 
