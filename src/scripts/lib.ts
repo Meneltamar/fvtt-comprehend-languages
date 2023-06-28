@@ -160,7 +160,7 @@ export async function translate_text(
   let data = new URLSearchParams(
     `auth_key=${token}&text=${encodeURIComponent(
       newText
-    )}&target_lang=${target_lang}&source_lang=EN&tag_handling=html`
+    )}&target_lang=${target_lang}&source_lang=EN&tag_handling=html&formality=prefer_more`
   );
 
   let response = await fetch(
