@@ -36,7 +36,7 @@ async function prepareSettings(
     inPlace
   );
 }
-describe("Basic Translation flow", () => {
+describe("JournalEntry Translation flow", () => {
   beforeEach(() => {
     cy.intercept("GET", "https://api-free.deepl.com/v2/translate*", {
       statusCode: 200,
@@ -182,6 +182,62 @@ describe("Basic Translation flow", () => {
     cy.get(".close > .fas").click();
     /* ==== End Cypress Studio ==== */
     cy.contains("InPlace (Copy)").rightclick();
+    cy.contains("Delete").click();
+    cy.contains("Yes").click();
+  });
+});
+
+describe("Item Translation flow", () => {
+  beforeEach(() => {
+    cy.intercept("GET", "https://api-free.deepl.com/v2/translate*", {
+      statusCode: 200,
+      body: mockTranslation,
+    }).as("translation");
+    cy.visit("http://localhost:30000");
+
+    expect(true).to.equal(true);
+    /* ==== Generated with Cypress Studio ==== */
+    cy.get("select").select("Mr8MWHjeLe3odkDd");
+    cy.get(".join-form > .form-footer > .bright").click();
+    cy.wait(1000);
+    cy.get('[data-tab="items"] > .fas').click();
+  });
+  it("Translates root level items in PF2e", () => {
+    cy.wait(1500);
+    cy.window().then(async (win) => {
+      await prepareSettings(win, false, false, false, false);
+    });
+    cy.get(".error > .close").click();
+    cy.get(".warning > .close").click();
+    cy.contains("TestItem").click();
+    cy.get("[id^=comprehend-languages_]").click();
+    cy.wait(1000);
+    cy.get(".close > .fas").click();
+    cy.contains("DE_TestItem").click();
+    cy.get(".editor-content").should("contain.text", "Translated Text");
+    cy.wait(1000);
+    cy.get(".close > .fas").click();
+    /* ==== End Cypress Studio ==== */
+    cy.contains("DE_TestItem").rightclick();
+    cy.contains("Delete").click();
+    cy.contains("Yes").click();
+  });
+  it("Translates root level items in PF2e inplace", () => {
+    cy.wait(1500);
+    cy.window().then(async (win) => {
+      await prepareSettings(win, false, false, false, true);
+    });
+    cy.get(".error > .close").click();
+    cy.get(".warning > .close").click();
+    cy.contains("TestItem").rightclick();
+    cy.contains("Duplicate").click();
+    cy.contains("TestItem (Copy)").click();
+    cy.get("[id^=comprehend-languages_]").click();
+    cy.wait(1000);
+    cy.get(".editor-content").should("contain.text", "Translated Text");
+    cy.get(".close > .fas").click();
+    /* ==== End Cypress Studio ==== */
+    cy.contains("TestItem (Copy)").rightclick();
     cy.contains("Delete").click();
     cy.contains("Yes").click();
   });
