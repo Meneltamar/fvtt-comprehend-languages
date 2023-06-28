@@ -145,7 +145,11 @@ export async function translate_text(
   token: string,
   target_lang: string
 ): Promise<string> {
-  // TODO Find a better method this is a retrocompatibility fix for issue #9 and fvtt 9
+  const formality = (await game.settings.get(
+    ComprehendLanguagesStatic.ID,
+    ComprehendLanguagesStatic.SETTINGS.FORMALITY
+  )) as string;
+
   let newText = text;
   newText = replaceAll(newText, `@Scene[`, `@UUID[Scene.`);
   newText = replaceAll(newText, `@Actor[`, `@UUID[Actor.`);
@@ -160,7 +164,7 @@ export async function translate_text(
   let data = new URLSearchParams(
     `auth_key=${token}&text=${encodeURIComponent(
       newText
-    )}&target_lang=${target_lang}&source_lang=EN&tag_handling=html&formality=prefer_more`
+    )}&target_lang=${target_lang}&source_lang=EN&tag_handling=html&formality=${formality}`
   );
 
   let response = await fetch(
@@ -209,7 +213,13 @@ export async function getTranslationSettings(): Promise<{
     ComprehendLanguagesStatic.ID,
     ComprehendLanguagesStatic.SETTINGS.IN_PLACE
   ) as boolean;
-  return { token, target_lang, makeSeparateFolder, translateInPlace };
+
+  return {
+    token,
+    target_lang,
+    makeSeparateFolder,
+    translateInPlace,
+  };
 }
 
 export async function dialogTokenMissing() {

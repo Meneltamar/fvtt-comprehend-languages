@@ -48,6 +48,61 @@ export class ComprehendLanguages {
 
     game.settings.register(
       ComprehendLanguagesStatic.ID,
+      ComprehendLanguagesStatic.SETTINGS.TARGET_LANG,
+      {
+        name: "Target Language",
+        config: true,
+        hint: "What should your target language be",
+        type: String,
+        default: "DE",
+        choices: {
+          BG: "Bulgarian",
+          CS: "Czech",
+          DA: "Danish",
+          DE: "German",
+          EL: "Greek",
+          EN: "English",
+          ES: "Spanish",
+          ET: "Estonian",
+          FI: "Finnish",
+          FR: "French",
+          HU: "Hungarian",
+          IT: "Italian",
+          JA: "Japanese",
+          LT: "Lithuanian",
+          LV: "Latvian",
+          NL: "Dutch",
+          PL: "Polish",
+          PT: "Portuguese (all Portuguese varieties mixed)",
+          RO: "Romanian",
+          RU: "Russian",
+          SK: "Slovak",
+          SL: "Slovenian",
+          SV: "Swedish",
+          ZH: "Chinese",
+        },
+        scope: "world",
+      }
+    );
+
+    game.settings.register(
+      ComprehendLanguagesStatic.ID,
+      ComprehendLanguagesStatic.SETTINGS.FORMALITY,
+      {
+        name: "Formality",
+        config: true,
+        hint: "How formal should the translations be (if the language supports it)",
+        type: String,
+        default: "prefer_more",
+        choices: {
+          prefer_more: "Prefer more formal",
+          prefer_less: "Prefer less formal",
+        },
+        scope: "world",
+      }
+    );
+    game.settings.register(
+      ComprehendLanguagesStatic.ID,
       ComprehendLanguagesStatic.SETTINGS.ICON_ONLY,
       {
         name: "Icon Only",
@@ -107,45 +162,6 @@ export class ComprehendLanguages {
         hint: "If enabled the original document will be overwritten with the translated text.",
         type: Boolean,
         default: false,
-        scope: "world",
-      }
-    );
-
-    game.settings.register(
-      ComprehendLanguagesStatic.ID,
-      ComprehendLanguagesStatic.SETTINGS.TARGET_LANG,
-      {
-        name: "Target Language",
-        config: true,
-        hint: "What should your target language be",
-        type: String,
-        default: "DE",
-        choices: {
-          BG: "Bulgarian",
-          CS: "Czech",
-          DA: "Danish",
-          DE: "German",
-          EL: "Greek",
-          EN: "English",
-          ES: "Spanish",
-          ET: "Estonian",
-          FI: "Finnish",
-          FR: "French",
-          HU: "Hungarian",
-          IT: "Italian",
-          JA: "Japanese",
-          LT: "Lithuanian",
-          LV: "Latvian",
-          NL: "Dutch",
-          PL: "Polish",
-          PT: "Portuguese (all Portuguese varieties mixed)",
-          RO: "Romanian",
-          RU: "Russian",
-          SK: "Slovak",
-          SL: "Slovenian",
-          SV: "Swedish",
-          ZH: "Chinese",
-        },
         scope: "world",
       }
     );
