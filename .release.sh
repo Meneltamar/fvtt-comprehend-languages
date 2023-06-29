@@ -1,3 +1,4 @@
+#!/bin/bash
 MANIFEST_SEARCH_PATTERN='(\s\"(manifest)\"\: \"https:\/\/github.com\/meneltamar\/fvtt-comprehend-languages\/releases\/).*(\/(module.json)\",)'
 DOWNLOAD_SEARCH_PATTERN='(\s\"(download)\"\: \"https:\/\/github.com\/meneltamar\/fvtt-comprehend-languages\/releases\/).*(\/(module.zip)\",)'
 #For version specific download
