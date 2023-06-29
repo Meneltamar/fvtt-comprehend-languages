@@ -68,7 +68,7 @@ jobs:
 
       - name: Publish to Foundry VTT Repo
         id: publish_foundry_repo
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main') && github.repository == 'meneltamar/fvtt-comprehend-languages'
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master') && github.repository == 'meneltamar/fvtt-comprehend-languages'
         run: npx @ghost-fvtt/foundry-publish
         env:
           FVTT_MANIFEST_PATH: "static/module.json"
