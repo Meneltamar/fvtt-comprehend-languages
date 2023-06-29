@@ -12,5 +12,5 @@ cp static/module.json dist &&
 sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"$1\"/" package.json &&
 npm install &&
 cd dist || exit &&
-zip -r fvtt-comprehend-languages.zip ./* &&
+zip -r module.zip ./* &&
 cd ..
