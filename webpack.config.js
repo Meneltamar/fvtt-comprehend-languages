@@ -47,7 +47,7 @@ module.exports = {
   plugins: [
     new CopyPlugin({
       patterns: [
-        { from: path.resolve(__dirname, "src/module.json") },
+        { from: path.resolve(__dirname, "static/module.json") },
         { from: "**", to: "languages/", context: "src/languages" },
         { from: "**", to: "styles/", context: "src/styles/" },
       ],
