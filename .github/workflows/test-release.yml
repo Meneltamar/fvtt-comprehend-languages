@@ -1,0 +1,77 @@
+name: Test and release
+
+# Run the workflow when a Pull Request is opened or when changes are pushed to main on 'xdy/xdy-pf2e-workbench' (i.e. don't run on forks)
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  release:
+    # Only release on push to main on meneltamar/fvtt-comprehend-languages
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master') && github.repository == 'meneltamar/fvtt-comprehend-languages'
+    runs-on: ubuntu-latest
+    # Waits for test jobs for each Node.js version to complete
+    #        needs: [ test ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: "true"
+
+        # Not sure this is the right way to do it
+      # - name: Pull & update submodules recursively
+      #   run: |
+      #     git submodule update --init --recursive
+      #     git submodule update --recursive --remote
+
+      # - uses: stefanzweifel/git-auto-commit-action@v4.16.0
+      #   with:
+      #     commit_message: "chore: Update submodules"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 18.x
+          cache: "npm"
+
+      - name: Install
+        run: npm install
+
+      - name: Build packs
+        run: npm run build:packs
+
+      - name: Build
+        run: npm run build
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+      - name: Get tag
+        run: echo "COMPREHEND_LANGUAGES_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+
+      # Publish the release to FoundryVTT's package repository only if push on main
+      #      - name: Publish to Foundry Admin
+      #        if: github.event_name == 'push' && (github.ref == 'refs/heads/master') && github.repository == 'meneltamar/fvtt-comprehend-languages'
+      #        uses: Varriount/fvtt-autopublish@v1.0.9
+      #        with:
+      #          username: ${{ secrets.FOUNDRY_ADMIN_USERNAME }}
+      #          password: ${{ secrets.FOUNDRY_ADMIN_PASSWORD }}
+      #          module-id: 2553
+      #          manifest-url: https://github.com/meneltamar/fvtt-comprehend-languages/releases/download/${{ env.COMPREHEND_LANGUAGES_VERSION }}/module.json
+      #          manifest-file: module.json
+      #
+      # - name: Install playwright
+      #   run: npx playwright install
+
+      - name: Publish to Foundry VTT Repo
+        id: publish_foundry_repo
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main') && github.repository == 'meneltamar/fvtt-comprehend-languages'
+        run: npx @ghost-fvtt/foundry-publish
+        env:
+          FVTT_MANIFEST_PATH: "static/module.json"
+          FVTT_PACKAGE_ID: ${{ 2553 }}
+          FVTT_USERNAME: ${{ secrets.FOUNDRY_ADMIN_USERNAME }}
+          FVTT_PASSWORD: ${{ secrets.FOUNDRY_ADMIN_PASSWORD }}
