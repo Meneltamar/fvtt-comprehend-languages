@@ -1,3 +1,10 @@
+## [2.2.3](https://github.com/Meneltamar/fvtt-comprehend-languages/compare/v2.2.2...v2.2.3) (2023-06-29)
+
+
+### Bug Fixes
+
+* Versioning and download fix. ([7da6681](https://github.com/Meneltamar/fvtt-comprehend-languages/commit/7da6681c5a2c06bf738820eba37c797c4a3841c8))
+
 ## [2.2.2](https://github.com/Meneltamar/fvtt-comprehend-languages/compare/v2.2.1...v2.2.2) (2023-06-29)
 
 
