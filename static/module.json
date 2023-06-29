@@ -2,7 +2,7 @@
   "id": "comprehend-languages",
   "title": "Comprehend Languages",
   "description": "",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "library": "false",
   "manifestPlusVersion": "1.0.0",
   "compatibility":{
