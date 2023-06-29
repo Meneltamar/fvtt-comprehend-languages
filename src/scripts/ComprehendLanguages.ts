@@ -113,7 +113,18 @@ export class ComprehendLanguages {
         scope: "world",
       }
     );
-
+    game.settings.register(
+      ComprehendLanguagesStatic.ID,
+      ComprehendLanguagesStatic.SETTINGS.IN_PLACE,
+      {
+        name: "Translate In Place (Overwriting the original)",
+        config: true,
+        hint: "If enabled the original document will be overwritten with the translated text. The following three settings will be ignored if this is enabled.",
+        type: Boolean,
+        default: false,
+        scope: "world",
+      }
+    );
     game.settings.register(
       ComprehendLanguagesStatic.ID,
       ComprehendLanguagesStatic.SETTINGS.SEPARATE_FOLDER,
@@ -147,19 +158,6 @@ export class ComprehendLanguages {
         name: "Translate Document Names",
         config: true,
         hint: "If enabled the names of Journals, Journal Pages and Items will be translated as well and the language prefix omitted.",
-        type: Boolean,
-        default: false,
-        scope: "world",
-      }
-    );
-
-    game.settings.register(
-      ComprehendLanguagesStatic.ID,
-      ComprehendLanguagesStatic.SETTINGS.IN_PLACE,
-      {
-        name: "Translate In Place (Overwriting the original)",
-        config: true,
-        hint: "If enabled the original document will be overwritten with the translated text.",
         type: Boolean,
         default: false,
         scope: "world",
